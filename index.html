@@ -1135,8 +1135,8 @@
 <span class="line">declare(strict_types=1);</span>
 <span class="line"></span>
 <span class="line">// getenv() is more reliable than $_ENV across php.ini configurations</span>
-<span class="line">$dsn = sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', getenv('DB_HOST'), getenv('DB_NAME'));</span>
-<span class="line">$pdo = new PDO($dsn, getenv('DB_USER'), getenv('DB_PASS'), [</span>
+<span class="line">$dsn = sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', (string) getenv('DB_HOST'), (string) getenv('DB_NAME'));</span>
+<span class="line">$pdo = new PDO($dsn, (string) getenv('DB_USER'), (string) getenv('DB_PASS'), [</span>
 <span class="line">    PDO::ATTR_ERRMODE =&gt; PDO::ERRMODE_EXCEPTION,</span>
 <span class="line">    PDO::ATTR_DEFAULT_FETCH_MODE =&gt; PDO::FETCH_ASSOC,</span>
 <span class="line">    PDO::ATTR_EMULATE_PREPARES =&gt; false, // use real prepared statements</span>
@@ -1213,21 +1213,21 @@
 <span class="line">declare(strict_types=1);</span>
 <span class="line"></span>
 <span class="line">use GuzzleHttp\Client;</span>
-<span class="line">use GuzzleHttp\Exception\RequestException;</span>
+<span class="line">use GuzzleHttp\Exception\GuzzleException;</span>
 <span class="line"></span>
 <span class="line">$client = new Client([</span>
 <span class="line">    'base_uri' =&gt; 'https://api.example.com/',</span>
 <span class="line">    'timeout' =&gt; 5.0,</span>
 <span class="line">    'headers' =&gt; [</span>
 <span class="line">        'Accept' =&gt; 'application/json',</span>
-<span class="line">        'Authorization' =&gt; 'Bearer ' . getenv('API_TOKEN'),</span>
+<span class="line">        'Authorization' =&gt; 'Bearer ' . (string) getenv('API_TOKEN'),</span>
 <span class="line">    ],</span>
 <span class="line">]);</span>
 <span class="line"></span>
 <span class="line">try {</span>
 <span class="line">    $response = $client-&gt;get('users/1');</span>
 <span class="line">    $user = json_decode($response-&gt;getBody()-&gt;getContents(), true, 512, JSON_THROW_ON_ERROR);</span>
-<span class="line">} catch (RequestException $e) {</span>
+<span class="line">} catch (GuzzleException $e) {</span>
 <span class="line">    error_log('HTTP request failed: ' . $e-&gt;getMessage());</span>
 <span class="line">    throw new RuntimeException('Unable to fetch user data.');</span>
 <span class="line">}</span></code></pre>
@@ -1354,16 +1354,17 @@
 <span class="line"></span>
 <span class="line">declare(strict_types=1);</span>
 <span class="line"></span>
+<span class="line">// Amounts are integer cents to avoid floating-point precision loss.</span>
 <span class="line">interface PaymentProcessor</span>
 <span class="line">{</span>
-<span class="line">    public function pay(float $amount): void;</span>
+<span class="line">    public function pay(int $amountInCents): void;</span>
 <span class="line">}</span>
 <span class="line"></span>
 <span class="line">final class StripeProcessor implements PaymentProcessor</span>
 <span class="line">{</span>
-<span class="line">    public function pay(float $amount): void</span>
+<span class="line">    public function pay(int $amountInCents): void</span>
 <span class="line">    {</span>
-<span class="line">        echo "Charging \${$amount} via Stripe\n";</span>
+<span class="line">        echo "Charging $" . number_format($amountInCents / 100, 2) . " via Stripe\n";</span>
 <span class="line">    }</span>
 <span class="line">}</span>
 <span class="line"></span>
@@ -1371,15 +1372,15 @@
 <span class="line">{</span>
 <span class="line">    public function __construct(private PaymentProcessor $processor) {}</span>
 <span class="line"></span>
-<span class="line">    public function completeOrder(float $amount): void</span>
+<span class="line">    public function completeOrder(int $amountInCents): void</span>
 <span class="line">    {</span>
-<span class="line">        $this-&gt;processor-&gt;pay($amount);</span>
+<span class="line">        $this-&gt;processor-&gt;pay($amountInCents);</span>
 <span class="line">    }</span>
 <span class="line">}</span>
 <span class="line"></span>
 <span class="line">// Inject the strategy</span>
 <span class="line">$checkout = new Checkout(new StripeProcessor());</span>
-<span class="line">$checkout-&gt;completeOrder(49.99);</span></code></pre>
+<span class="line">$checkout-&gt;completeOrder(4999); // $49.99</span></code></pre>
                                     </div>
 
                                     <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
