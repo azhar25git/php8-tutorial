@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modern PHP 8.x Masterclass — Complete Guide</title>
     <meta name="description" content="A comprehensive, modern guide to PHP 8.x programming covering beginner to advanced topics.">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script>
+        (function () {
+            const stored = localStorage.getItem('php-guide-dark-mode');
+            const dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (dark) document.documentElement.classList.add('dark');
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
     <script>
@@ -419,7 +427,7 @@
                                 <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
                                     <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
                                     <p>PHP provides <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">for</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">while</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">do-while</code>, and <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">foreach</code>. The <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">foreach</code> loop is the canonical tool for iterating arrays and objects implementing <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">Traversable</code>. By default it iterates over the array without modifying it; use <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">foreach ($items as &amp;$item)</code> to mutate the original array in place.</p>
-                                    <p>Modern PHP favors <strong>functional-style transformations</strong> (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">array_map</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">array_filter</code>) or generators for large datasets instead of manual loops. The Zend Engine optimizes <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">foreach</code> over arrays efficiently by tracking an internal array pointer, but generators avoid materializing entire collections in memory.</p>
+                                    <p>Modern PHP favors <strong>functional-style transformations</strong> (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">array_map</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">array_filter</code>) or generators for large datasets instead of manual loops. The Zend Engine optimizes <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">foreach</code> with copy-on-write iterators, but generators still avoid materializing entire collections in memory.</p>
 
                                     <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
                                     <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
@@ -606,7 +614,7 @@
 <span class="line">$rawEmail = $_POST['email'] ?? '';</span>
 <span class="line">$email = filter_var($rawEmail, FILTER_VALIDATE_EMAIL);</span>
 <span class="line"></span>
-<span class="line">if ($email === false || $email === null) {</span>
+<span class="line">if ($email === false) {</span>
 <span class="line">    http_response_code(422);</span>
 <span class="line">    echo 'Invalid email address.';</span>
 <span class="line">    exit;</span>
@@ -650,6 +658,7 @@
 <span class="line">session_start();</span>
 <span class="line"></span>
 <span class="line">// After verifying credentials, rotate the session ID to prevent fixation</span>
+<span class="line">// authenticateUser() is your credential-checking routine (returns int|null)</span>
 <span class="line">$userId = authenticateUser($_POST['email'] ?? '', $_POST['password'] ?? '');</span>
 <span class="line"></span>
 <span class="line">if ($userId !== null) {</span>
@@ -1027,9 +1036,9 @@
 <span class="line">        "phpunit/phpunit": "^10.5",</span>
 <span class="line">        "phpstan/phpstan": "^1.10"</span>
 <span class="line">    },</span>
-<span class="line">    "autoload": {
+<span class="line">    "autoload": {</span>
 <span class="line">        "psr-4": {</span>
-<span class="line">            "App\\\\": "src/"</span>
+<span class="line">            "App\\": "src/"</span>
 <span class="line">        }</span>
 <span class="line">    },</span>
 <span class="line">    "autoload-dev": {</span>
@@ -1438,7 +1447,7 @@
                                 <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
                                     <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
                                     <p>The <strong>Zend Engine</strong> compiles PHP scripts into bytecode (opcodes), executes them on a virtual machine, and manages memory through reference counting with a cycle-collecting garbage collector. Objects and arrays are reference-counted; when the count drops to zero, memory is reclaimed. Circular references are detected by the garbage collector.</p>
-                                    <p><strong>OPcache</strong> stores compiled bytecode in shared memory so that PHP does not recompile files on every request. It is the single most important performance extension for production PHP. PHP 8.0+ also includes a <strong>JIT (Just-In-Time)</strong> compiler that translates hot bytecode into native machine code, significantly improving CPU-bound workloads.</p>
+                                    <p><strong>OPcache</strong> stores compiled bytecode in shared memory so that PHP does not recompile files on every request. It is the single most important performance extension for production PHP. PHP 8.0+ also includes a <strong>JIT (Just-In-Time)</strong> compiler that translates hot bytecode into native machine code; it can improve CPU-bound workloads, but typical I/O-bound web requests often see modest gains.</p>
 
                                     <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
                                     <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
@@ -1481,11 +1490,18 @@
 <span class="line"></span>
 <span class="line">// Hash a password</span>
 <span class="line">$hash = password_hash($plainPassword, PASSWORD_DEFAULT);</span>
+<span class="line">if ($hash === false) {</span>
+<span class="line">    throw new RuntimeException('Password hashing failed.');</span>
+<span class="line">}</span>
 <span class="line"></span>
 <span class="line">// Verify on login</span>
 <span class="line">if (password_verify($plainPassword, $hash)) {</span>
 <span class="line">    if (password_needs_rehash($hash, PASSWORD_DEFAULT)) {</span>
-<span class="line">        $hash = password_hash($plainPassword, PASSWORD_DEFAULT);</span>
+<span class="line">        $newHash = password_hash($plainPassword, PASSWORD_DEFAULT);</span>
+<span class="line">        if ($newHash === false) {</span>
+<span class="line">            throw new RuntimeException('Password rehashing failed.');</span>
+<span class="line">        }</span>
+<span class="line">        $hash = $newHash;</span>
 <span class="line">        // store updated hash</span>
 <span class="line">    }</span>
 <span class="line">}</span>
@@ -1494,8 +1510,8 @@
 <span class="line">$safe = htmlspecialchars($userInput, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');</span>
 <span class="line">echo "&lt;p&gt;{$safe}&lt;/p&gt;";</span>
 <span class="line"></span>
-<span class="line">// Secure headers</span>
-<span class="line">header('Content-Security-Policy: default-src \'self\'');</span>
+<span class="line">// Secure headers. In production, serve inline scripts/styles with nonces/hashes instead of 'unsafe-inline'.</span>
+<span class="line">header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'");</span>
 <span class="line">header('X-Frame-Options: DENY');</span>
 <span class="line">header('Strict-Transport-Security: max-age=31536000; includeSubDomains');</span></code></pre>
                                     </div>
@@ -1601,7 +1617,7 @@
                             @click="goToPreviousModule()"
                             class="flex-1 flex items-center justify-start gap-3 rounded-xl border border-github-200 bg-white px-5 py-4 text-left shadow-sm transition hover:border-php-300 hover:bg-php-50 dark:border-github-700 dark:bg-github-900 dark:hover:border-php-700 dark:hover:bg-php-900/20"
                         >
-                            <svg class="h-5 w-5 flex-shrink-0 text-github-400 dark:text-github-500 dark:text-github-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            <svg class="h-5 w-5 flex-shrink-0 text-github-400 dark:text-github-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                             <div>
                                 <span class="block text-xs font-medium uppercase tracking-wider text-github-500 dark:text-github-400">Previous module</span>
                                 <span class="block text-base font-semibold text-github-900 dark:text-github-100" x-text="previousModule ? previousModule.title : ''"></span>
@@ -1616,7 +1632,7 @@
                                 <span class="block text-xs font-medium uppercase tracking-wider text-github-500 dark:text-github-400">Next module</span>
                                 <span class="block text-base font-semibold text-github-900 dark:text-github-100" x-text="nextModule ? nextModule.title : ''"></span>
                             </div>
-                            <svg class="h-5 w-5 flex-shrink-0 text-github-400 dark:text-github-500 dark:text-github-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            <svg class="h-5 w-5 flex-shrink-0 text-github-400 dark:text-github-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </button>
                     </div>
                 </nav>
