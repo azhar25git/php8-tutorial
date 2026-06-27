@@ -42,6 +42,7 @@
     </script>
     <style>
         [x-cloak] { display: none !important; }
+        @media (min-width: 1024px) { aside[x-cloak] { display: block !important; } }
         html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
         .prose h1, .prose h2, .prose h3, .prose h4 { scroll-margin-top: 5rem; }
         .code-block { counter-reset: line; }
@@ -86,7 +87,7 @@
     </header>
 
     <div class="flex min-h-screen pt-16">
-        <aside class="fixed top-16 bottom-0 left-0 z-40 w-72 transform border-r border-github-200 bg-github-50 transition-transform duration-200 ease-in-out lg:translate-x-0 overflow-y-auto custom-scroll dark:border-github-800 dark:bg-github-900"
+        <aside x-cloak class="fixed top-16 bottom-0 left-0 z-40 w-72 transform border-r border-github-200 bg-github-50 transition-transform duration-200 ease-in-out lg:translate-x-0 overflow-y-auto custom-scroll dark:border-github-800 dark:bg-github-900"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
             @click.away="sidebarOpen = false">
             <nav class="px-4 py-6" aria-label="Guide navigation">
@@ -103,7 +104,7 @@
                                 </button>
                                 <div x-show="isModuleOpen(module.id)" class="mt-1 space-y-0.5">
                                     <template x-for="topic in module.topics" :key="topic.id">
-                                        <a :href="'#' + topic.id" @click.prevent="window.location.hash = topic.id"
+                                        <a :href="'#' + topic.id" @click.prevent="window.location.hash = topic.id; if (window.innerWidth < 1024) sidebarOpen = false"
                                             class="block rounded-md px-3 py-1.5 text-sm transition-colors border-l-4"
                                             :class="activeTopic === topic.id ? 'bg-php-100 text-php-900 font-medium border-php-600 dark:bg-php-900/30 dark:text-php-300' : 'text-github-600 hover:bg-github-100 hover:text-github-900 border-transparent dark:text-github-400 dark:hover:bg-github-800 dark:hover:text-github-200'"
                                             :aria-current="activeTopic === topic.id ? 'page' : false"
