@@ -88,8 +88,7 @@
 
     <div class="flex min-h-screen pt-16">
         <aside x-cloak class="fixed top-16 bottom-0 left-0 z-40 w-72 transform border-r border-github-200 bg-github-50 transition-transform duration-200 ease-in-out lg:translate-x-0 overflow-y-auto custom-scroll dark:border-github-800 dark:bg-github-900"
-            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-            @click.away="sidebarOpen = false">
+            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
             <nav class="px-4 py-6" aria-label="Guide navigation">
                 <template x-for="(part, partIndex) in parts" :key="'part-' + partIndex">
                     <div class="mb-6">
