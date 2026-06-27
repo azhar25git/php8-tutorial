@@ -96,7 +96,7 @@
                         <template x-for="(module, moduleIndex) in part.modules" :key="'module-' + module.id">
                             <div class="mb-3">
                                 <button @click="toggleModule(module.id)"
-                                    class="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm font-semibold text-github-700 hover:bg-github-100 hover:text-github-900 dark:text-github-300 dark:hover:bg-github-800 dark:hover:text-github-100"
+                                    class="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-sm font-semibold text-github-700 hover:bg-github-100 hover:text-github-900 dark:text-github-300 dark:hover:bg-github-800 dark:hover:text-github-100"
                                     :aria-expanded="isModuleOpen(module.id)">
                                     <span x-text="module.title"></span>
                                     <svg class="mt-0.5 h-4 w-4 shrink-0 self-start transition-transform" :class="isModuleOpen(module.id) ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
