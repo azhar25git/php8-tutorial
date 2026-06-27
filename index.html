@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern PHP 8.x Masterclass — Complete Guide</title>
+    <meta name="description" content="A comprehensive, modern guide to PHP 8.x programming covering beginner to advanced topics.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        github: {
+                            50: '#f6f8fa', 100: '#eaeef2', 200: '#d0d7de', 300: '#afb8c1',
+                            400: '#8c959f', 500: '#6e7781', 600: '#57606a', 700: '#424a53',
+                            800: '#32383f', 900: '#24292f', 950: '#1b1f24',
+                        },
+                        php: {
+                            50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe', 300: '#c4b5fd',
+                            400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9',
+                            800: '#5b21b6', 900: '#4c1d95',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system','BlinkMacSystemFont','Segoe UI','Noto Sans','Helvetica','Arial','sans-serif'],
+                        mono: ['SFMono-Regular','Consolas','Liberation Mono','Menlo','Courier','monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+        .prose h1, .prose h2, .prose h3, .prose h4 { scroll-margin-top: 5rem; }
+        .code-block { counter-reset: line; }
+        .line { display: block; padding-left: 1rem; }
+        .line::before { counter-increment: line; content: counter(line); display: inline-block; width: 2rem; margin-left: -1rem; margin-right: 0.5rem; text-align: right; color: #6e7781; user-select: none; }
+        .custom-scroll::-webkit-scrollbar { width: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #d0d7de; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #afb8c1; }
+        .dark .line::before { color: #8c959f; }
+        .dark ::-webkit-scrollbar-thumb { background: #424a53; }
+        .dark ::-webkit-scrollbar-thumb:hover { background: #57606a; }
+    </style>
+</head>
+<body class="bg-white text-github-900 antialiased transition-colors duration-200 dark:bg-github-950 dark:text-github-100" x-data="phpGuide()" x-init="init()">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-php-600 focus:px-4 focus:py-2 focus:text-white">Skip to content</a>
+
+    <header class="fixed top-0 left-0 right-0 z-50 border-b border-github-200 bg-white/95 backdrop-blur transition-colors duration-200 dark:border-github-800 dark:bg-github-900/95">
+        <div class="flex h-16 items-center justify-between px-4 lg:px-8">
+            <div class="flex items-center gap-3">
+                <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden -ml-2 p-2 rounded-md hover:bg-github-100 dark:hover:bg-github-800" aria-label="Toggle navigation">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <a href="#" class="flex items-center gap-2 text-base sm:text-lg font-semibold text-github-900 hover:text-php-600 dark:text-github-100 dark:hover:text-php-400">
+                    <span class="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-php-600 text-white font-bold text-xs sm:text-sm">PHP</span>
+                    <span class="hidden sm:inline">Modern PHP 8.x Masterclass</span>
+                    <span class="sm:hidden">PHP Guide</span>
+                </a>
+            </div>
+            <div class="flex items-center gap-3 sm:gap-6 text-sm">
+                <div class="hidden md:flex items-center gap-4 text-github-600 dark:text-github-400">
+                    <span class="font-mono text-xs bg-github-100 dark:bg-github-800 px-2 py-1 rounded">32 Topics</span>
+                    <span class="font-mono text-xs bg-github-100 dark:bg-github-800 px-2 py-1 rounded">9 Modules</span>
+                    <a href="https://www.php.net/" target="_blank" rel="noopener" class="hover:text-github-900 dark:hover:text-github-200">php.net ↗</a>
+                </div>
+                <button @click="toggleDarkMode()" class="p-2 rounded-md hover:bg-github-100 dark:hover:bg-github-800" :aria-label="darkMode ? 'Switch to light mode' : 'Switch to dark mode'">
+                    <svg x-show="!darkMode" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg x-show="darkMode" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex min-h-screen pt-16">
+        <aside class="fixed top-16 bottom-0 left-0 z-40 w-72 transform border-r border-github-200 bg-github-50 transition-transform duration-200 ease-in-out lg:translate-x-0 overflow-y-auto custom-scroll dark:border-github-800 dark:bg-github-900"
+            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+            @click.away="sidebarOpen = false">
+            <nav class="px-4 py-6" aria-label="Guide navigation">
+                <template x-for="(part, partIndex) in parts" :key="'part-' + partIndex">
+                    <div class="mb-6">
+                        <h3 class="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-github-500 dark:text-github-400" x-text="part.title"></h3>
+                        <template x-for="(module, moduleIndex) in part.modules" :key="'module-' + module.id">
+                            <div class="mb-3">
+                                <button @click="toggleModule(module.id)"
+                                    class="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm font-semibold text-github-700 hover:bg-github-100 hover:text-github-900 dark:text-github-300 dark:hover:bg-github-800 dark:hover:text-github-100"
+                                    :aria-expanded="isModuleOpen(module.id)">
+                                    <span x-text="module.title"></span>
+                                    <svg class="h-4 w-4 transition-transform" :class="isModuleOpen(module.id) ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                                <div x-show="isModuleOpen(module.id)" class="mt-1 space-y-0.5">
+                                    <template x-for="topic in module.topics" :key="topic.id">
+                                        <a :href="'#' + topic.id" @click.prevent="window.location.hash = topic.id"
+                                            class="block rounded-md px-3 py-1.5 text-sm transition-colors border-l-4"
+                                            :class="activeTopic === topic.id ? 'bg-php-100 text-php-900 font-medium border-php-600 dark:bg-php-900/30 dark:text-php-300' : 'text-github-600 hover:bg-github-100 hover:text-github-900 border-transparent dark:text-github-400 dark:hover:bg-github-800 dark:hover:text-github-200'"
+                                            :aria-current="activeTopic === topic.id ? 'page' : false"
+                                            x-text="topic.number + '. ' + topic.title"></a>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </nav>
+        </aside>
+
+        <div x-show="sidebarOpen" class="fixed inset-0 z-30 bg-black/30 lg:hidden" @click="sidebarOpen = false" x-transition.opacity></div>
+
+        <main id="main-content" class="flex-1 min-w-0 lg:ml-72">
+            <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10 lg:px-12">
+                <article class="max-w-none">
+
+                    <!-- Hero shown only on first module -->
+                    <div x-show="activeModule === 'module-1'" x-cloak class="mb-8 sm:mb-12 border-b border-github-200 pb-6 sm:pb-8 dark:border-github-800" id="guide-start">
+                        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-github-900 dark:text-github-100 mb-4">Modern PHP 8.x Masterclass</h1>
+                        <p class="text-lg sm:text-xl text-github-600 dark:text-github-400 leading-relaxed">A definitive guide to PHP programming from core interpreter fundamentals to enterprise engineering and high-performance deployment. Every topic is presented through the lens of <strong>Modern PHP</strong>, with idiomatic PHP 8+ code, legacy contrast, and explicit anti-pattern corrections.</p>
+                        <div class="mt-6 flex flex-wrap gap-2">
+                            <span class="inline-flex items-center rounded-full bg-php-50 px-3 py-1 text-xs font-medium text-php-700 ring-1 ring-inset ring-php-700/10 dark:bg-php-900/20 dark:text-php-300 dark:ring-php-500/20">PHP 8.x</span>
+                            <span class="inline-flex items-center rounded-full bg-github-50 px-3 py-1 text-xs font-medium text-github-600 ring-1 ring-inset ring-github-500/10 dark:bg-github-800 dark:text-github-300 dark:ring-github-500/20">PSR-12 / PER</span>
+                            <span class="inline-flex items-center rounded-full bg-github-50 px-3 py-1 text-xs font-medium text-github-600 ring-1 ring-inset ring-github-500/10 dark:bg-github-800 dark:text-github-300 dark:ring-github-500/20">Security First</span>
+                            <span class="inline-flex items-center rounded-full bg-github-50 px-3 py-1 text-xs font-medium text-github-600 ring-1 ring-inset ring-github-500/10 dark:bg-github-800 dark:text-github-300 dark:ring-github-500/20">Production Ready</span>
+                        </div>
+                    </div>
+
+                    <!-- Compact module header -->
+                    <div class="mb-8 sm:mb-10">
+                        <template x-for="part in parts" :key="part.title">
+                            <div>
+                                <template x-for="module in part.modules" :key="module.id">
+                                    <div x-show="activeModule === module.id" x-cloak>
+                                        <span class="text-xs font-bold uppercase tracking-wider text-php-600 dark:text-php-400" x-text="part.title"></span>
+                                        <h2 class="text-2xl sm:text-3xl font-bold text-github-900 dark:text-github-100 mt-1" x-text="module.title"></h2>
+                                        <p class="mt-2 text-sm text-github-500 dark:text-github-400">
+                                            <span x-text="module.topics.length"></span> topics
+                                        </p>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+
+                    <section id="part-1" class="mb-16">
+                        <div class="mb-12" id="module-1" x-show="activeModule === 'module-1'" x-cloak>
+                            <h3 class="text-2xl font-bold text-github-900 dark:text-github-100 border-b border-github-200 dark:border-github-700 pb-3 mb-6">Module 1: Environment &amp; Strict Foundations</h3>
+
+                            <div class="mb-10" id="topic-1">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">1</span> The Modern PHP Ecosystem</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>PHP is no longer a simple CGI script runner. In production, it runs primarily as <strong>PHP-FPM</strong> (FastCGI Process Manager) behind a reverse proxy such as nginx or Apache. The <strong>CLI SAPI</strong> handles cron jobs, queues, migrations, and local development. PHP 8.x also ships a <strong>built-in development server</strong> (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">php -S localhost:8000</code>) which is useful only for local prototyping — never expose it to untrusted networks.</p>
+                                    <p>The Zend Engine compiles PHP source into <strong>opcodes</strong>, executes them in a request lifecycle, and destroys the request-bound state at the end of every HTTP request. This <strong>shared-nothing architecture</strong> is PHP's superpower for horizontal scaling and isolation, but it also means the developer must explicitly persist state via sessions, cookies, databases, or caches.</p>
+                                    <p>Modern <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">php.ini</code> configuration is security-critical: disable dangerous functions, set sane upload limits, enforce <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">expose_php = Off</code>, configure OPcache in production, and keep error display disabled on public-facing servers.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800">
+                                            <span class="text-github-300 font-mono text-xs">php.ini — production baseline</span>
+                                            <button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button>
+                                        </div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">; Hide PHP version from response headers</span>
+<span class="line">expose_php = Off</span>
+<span class="line"></span>
+<span class="line">; Do not show errors to users in production</span>
+<span class="line">display_errors = Off</span>
+<span class="line">log_errors = On</span>
+<span class="line">error_log = /var/log/php/error.log</span>
+<span class="line"></span>
+<span class="line">; Sane resource limits</span>
+<span class="line">memory_limit = 256M</span>
+<span class="line">upload_max_filesize = 10M</span>
+<span class="line">post_max_size = 12M</span>
+<span class="line">max_execution_time = 30</span>
+<span class="line"></span>
+<span class="line">; OPcache — mandatory in production</span>
+<span class="line">opcache.enable = 1</span>
+<span class="line">opcache.memory_consumption = 256</span>
+<span class="line">opcache.max_accelerated_files = 10000</span>
+<span class="line">opcache.validate_timestamps = 0 ; Set 1 only in development</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Using the built-in server in production:</strong> It is single-threaded, has no process manager, and is trivial to crash. Use PHP-FPM behind nginx/Apache.</li>
+                                        <li><strong>Leaving <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">display_errors = On</code> in production:</strong> Stack traces leak paths and internals. Log server-side, return generic messages.</li>
+                                        <li><strong>Editing code directly on shared hosting without version control:</strong> Modern PHP projects live in Git, use Composer, and deploy through CI/CD pipelines.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-2">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">2</span> Variables, Scope, &amp; Dynamic Typing</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>PHP variables are declared with a leading <strong><code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$</code></strong> sigil and are dynamically typed by default. The Zend Engine stores variables as <strong>zvals</strong> — containers that hold both a value and a type tag. This allows type juggling at runtime, but it also creates entire classes of bugs when implicit conversions surprise the developer.</p>
+                                    <p>Scope is predominantly <strong>function-local</strong>. Variables created inside a function are destroyed when the function returns unless explicitly captured via <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">global</code> or closure <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">use</code>. Global scope is available but should be treated as a code smell; modern code prefers dependency injection or explicit function arguments.</p>
+                                    <p><strong>Variable variables</strong> (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$$name</code>) and <strong>variable functions</strong> remain supported, but they are rarely justified in production because they break static analysis, autocompletion, and security review.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">scope.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">$greeting = 'Hello'; // Script/global scope</span>
+<span class="line"></span>
+<span class="line">function createMessage(string $name): string</span>
+<span class="line">{</span>
+<span class="line">    // Local scope: $prefix is not visible outside</span>
+<span class="line">    $prefix = 'Welcome,';</span>
+<span class="line">    return "{$prefix} {$name}!";</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">// Prefer passing data explicitly instead of global</span>
+<span class="line">echo createMessage('Azhar'); // Welcome, Azhar!</span>
+<span class="line"></span>
+<span class="line">// Variable variables exist, but avoid them in production</span>
+<span class="line">$field = 'username';</span>
+<span class="line">$username = 'admin';</span>
+<span class="line">// echo $$field; // Works, but impossible to statically analyze</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Relying on <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">global</code> inside functions:</strong> It couples code to hidden state. Pass dependencies as parameters or inject them.</li>
+                                        <li><strong>Assuming dynamic typing means "no types":</strong> PHP 8 has first-class scalar types, union types, and return types. Use them.</li>
+                                        <li><strong>Variable variables in business logic:</strong> They make refactoring dangerous and bypass static analysis. Use arrays or objects instead.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-3">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">3</span> Data Types &amp; Strict Types</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>PHP provides <strong>scalar</strong> types (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">int</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">float</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">string</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">bool</code>), <strong>compound</strong> types (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">array</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">object</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">callable</code>), and <strong>special</strong> types (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">null</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">resource</code>). PHP 8.0 added <strong>union types</strong>, <strong>mixed</strong>, and <strong>static</strong> return types; PHP 8.1 added <strong>never</strong>.</p>
+                                    <p>By default, PHP <strong>coerces</strong> types when possible. A string <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">"42"</code> passed to an <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">int</code> parameter becomes <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">42</code> without error. Coercion is convenient but dangerous. Modern PHP places <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">declare(strict_types=1);</code> at the top of every file to enforce <strong>strict type checking</strong>. In strict mode, a wrong type throws a <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">TypeError</code> at the call boundary.</p>
+                                    <p>The Zend Engine performs type checks at the call boundary and, in strict mode, rejects any value that does not exactly match the declared type. This catches bugs earlier and eliminates whole categories of injection-style type confusion.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">strict_types.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">function calculateTotal(int $quantity, float $unitPrice): float</span>
+<span class="line">{</span>
+<span class="line">    return $quantity * $unitPrice;</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">// Strict mode rejects strings that look like numbers.</span>
+<span class="line">// calculateTotal("5", "10.5"); // TypeError</span>
+<span class="line"></span>
+<span class="line">$total = calculateTotal(5, 10.5); // 52.5</span>
+<span class="line"></span>
+<span class="line">// Union types are allowed when a value legitimately varies</span>
+<span class="line">function describeValue(int|string|null $value): string</span>
+<span class="line">{</span>
+<span class="line">    return match (true) {</span>
+<span class="line">        is_int($value) => "integer: {$value}",</span>
+<span class="line">        is_string($value) => "string: {$value}",</span>
+<span class="line">        default => 'no value',</span>
+<span class="line">    };</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Omitting <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">declare(strict_types=1)</code>:</strong> Coercion hides bugs. Every file should opt into strict types.</li>
+                                        <li><strong>Using <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">mixed</code> everywhere:</strong> It is useful for generic boundaries, but it should not replace specific type hints.</li>
+                                        <li><strong>Trusting input types because a form field is numeric:</strong> Validate and type-hint at the boundary. Never trust user data.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-4">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">4</span> Output &amp; String Manipulation</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>PHP offers multiple output mechanisms. <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">echo</code> is a language construct that accepts comma-separated arguments and has no return value. <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">print</code> is also a construct but behaves like a function and returns <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">1</code>; it is rarely used in modern code. <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">printf()</code> provides formatted output using type specifiers and is useful for CLI tooling.</p>
+                                    <p>String interpolation allows embedding variables directly inside double-quoted strings or heredocs. Complex expressions require the <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">{$object->property}</code> syntax. <strong>Heredoc</strong> (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">&lt;&lt;&lt;LABEL</code>) behaves like double quotes but spans multiple lines. <strong>Nowdoc</strong> (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">&lt;&lt;&lt;'LABEL'</code>) behaves like single quotes and does not interpolate — ideal for SQL snippets, templates, or raw payloads.</p>
+                                    <p>Modern output is almost never raw <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">echo</code> in a web context. It is rendered through templates, JSON encoders, or view components, and is always escaped to prevent XSS.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">output.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">$name = 'Azhar';</span>
+<span class="line">$score = 95;</span>
+<span class="line"></span>
+<span class="line">// Interpolation</span>
+<span class="line">echo "Welcome, {$name}!\n";</span>
+<span class="line"></span>
+<span class="line">// printf formatting</span>
+<span class="line">printf("Score: %d%% (%s)\n", $score, $name);</span>
+<span class="line"></span>
+<span class="line">// Nowdoc: no interpolation, perfect for raw SQL</span>
+<span class="line">$sql = &lt;&lt;&lt;'SQL'</span>
+<span class="line">    SELECT id, email</span>
+<span class="line">    FROM users</span>
+<span class="line">    WHERE active = 1</span>
+<span class="line">SQL;</span>
+<span class="line"></span>
+<span class="line">// Heredoc: interpolation allowed</span>
+<span class="line">$html = &lt;&lt;&lt;HTML</span>
+<span class="line">&lt;p&gt;Hello, {$name}&lt;/p&gt;</span>
+<span class="line">HTML;</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Echoing user input unescaped:</strong> Always escape with <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">htmlspecialchars($value, ENT_QUOTES, 'UTF-8')</code> before HTML output.</li>
+                                        <li><strong>Concatenating massive strings with <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">.</code> in loops:</strong> PHP strings are immutable; repeated concatenation reallocates memory. Build arrays and <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">implode()</code> them.</li>
+                                        <li><strong>Using heredoc for SQL with variables:</strong> That is SQL injection. Use nowdoc with prepared statements instead.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-12" id="module-2" x-show="activeModule === 'module-2'" x-cloak>
+                            <h3 class="text-2xl font-bold text-github-900 dark:text-github-100 border-b border-github-200 dark:border-github-700 pb-3 mb-6">Module 2: Operators &amp; Control Structures</h3>
+
+                            <div class="mb-10" id="topic-5">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">5</span> Operators &amp; Comparisons</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>PHP operators should be chosen deliberately. The <strong>identity operator</strong> <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">===</code> compares both value and type, while the <strong>equality operator</strong> <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">==</code> performs type juggling. Legacy PHP code is full of <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">==</code> bugs such as <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">"0e12345" == "0e67890"</code> evaluating to <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">true</code> due to numeric string coercion.</p>
+                                    <p>The <strong>spaceship operator</strong> <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">&lt;=&gt;</code>, introduced in PHP 7, returns <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">-1</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">0</code>, or <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">1</code> for less-than, equal-to, and greater-than comparisons. It is the canonical choice for sorting callbacks and comparison logic. The <strong>null coalescing operator</strong> <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">??</code> returns the left operand if it exists and is not <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">null</code>; otherwise it returns the right operand. PHP 7.4 added the <strong>null coalescing assignment</strong> <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">??=</code>.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">operators.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">$a = 10;</span>
+<span class="line">$b = '10';</span>
+<span class="line"></span>
+<span class="line">// Always prefer identity comparison</span>
+<span class="line">var_dump($a == $b);  // true  (type juggling)</span>
+<span class="line">var_dump($a === $b); // false (type-safe)</span>
+<span class="line"></span>
+<span class="line">// Spaceship operator</span>
+<span class="line">$points = [34, 12, 89, 5];</span>
+<span class="line">usort($points, static fn (int $x, int $y): int => $x &lt;=&gt; $y);</span>
+<span class="line"></span>
+<span class="line">// Null coalescing</span>
+<span class="line">$config = [];</span>
+<span class="line">$timeout = $config['timeout'] ?? 30;</span>
+<span class="line">$config['cache'] ??= true; // assign only if missing/null</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Using <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">==</code> for security checks:</strong> Use <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">===</code> everywhere, especially when comparing tokens, hashes, or identifiers.</li>
+                                        <li><strong>Confusing <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">isset()</code> with <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">??</code>:</strong> They behave similarly for null checks, but <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">??</code> is cleaner and chainable.</li>
+                                        <li><strong>Using <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">&lt;=&gt;</code> in boolean contexts:</strong> It returns <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">-1</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">0</code>, or <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">1</code>. All three are truthy except 0, which is a footgun if treated as boolean.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-6">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">6</span> Control Flow</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>Control flow in PHP follows familiar C-style syntax. <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">if/else</code> chains remain the workhorse for conditional logic. The <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">switch</code> statement performs loose comparisons by default and falls through cases unless <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">break</code> is used — a historically common source of bugs.</p>
+                                    <p>PHP 8 introduced the <strong><code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">match</code></strong> expression. Unlike <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">switch</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">match</code> is an expression (it returns a value), uses strict identity comparison (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">===</code>), does not fall through, and requires every branch to be exhaustive. It is the modern replacement for many <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">switch</code> use cases.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">control_flow.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">$statusCode = 404;</span>
+<span class="line"></span>
+<span class="line">// Modern match expression</span>
+<span class="line">$message = match ($statusCode) {</span>
+<span class="line">    200 => 'OK',</span>
+<span class="line">    301, 302 => 'Redirect',</span>
+<span class="line">    401 => 'Unauthorized',</span>
+<span class="line">    403 => 'Forbidden',</span>
+<span class="line">    404 => 'Not Found',</span>
+<span class="line">    default => 'Unknown Status',</span>
+<span class="line">};</span>
+<span class="line"></span>
+<span class="line">// Match can branch on arbitrary conditions</span>
+<span class="line">$score = 85;</span>
+<span class="line">$grade = match (true) {</span>
+<span class="line">    $score >= 90 => 'A',</span>
+<span class="line">    $score >= 80 => 'B',</span>
+<span class="line">    $score >= 70 => 'C',</span>
+<span class="line">    default => 'F',</span>
+<span class="line">};</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Missing <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">break</code> in switch:</strong> Accidental fall-through causes logic errors. Use <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">match</code> or explicitly comment intentional fall-through.</li>
+                                        <li><strong>Using <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">switch</code> with mixed types:</strong> Loose comparison leads to surprising results. Prefer <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">match</code> for type safety.</li>
+                                        <li><strong>Deeply nested if/else ladders:</strong> Flatten with early returns, guard clauses, or <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">match</code>.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-7">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">7</span> Loop Constructs</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>PHP provides <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">for</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">while</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">do-while</code>, and <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">foreach</code>. The <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">foreach</code> loop is the canonical tool for iterating arrays and objects implementing <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">Traversable</code>. By default it iterates over the array without modifying it; use <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">foreach ($items as &amp;$item)</code> to mutate the original array in place.</p>
+                                    <p>Modern PHP favors <strong>functional-style transformations</strong> (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">array_map</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">array_filter</code>) or generators for large datasets instead of manual loops. The Zend Engine optimizes <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">foreach</code> over arrays efficiently by tracking an internal array pointer, but generators avoid materializing entire collections in memory.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">loops.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">$users = [</span>
+<span class="line">    ['id' => 1, 'name' => 'Alice'],</span>
+<span class="line">    ['id' => 2, 'name' => 'Bob'],</span>
+<span class="line">];</span>
+<span class="line"></span>
+<span class="line">// Foreach with key and value</span>
+<span class="line">foreach ($users as $index => $user) {</span>
+<span class="line">    echo "{$index}: {$user['name']}\n";</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">// Prefer array functions for transformations</span>
+<span class="line">$names = array_map(</span>
+<span class="line">    static fn (array $user): string => $user['name'],</span>
+<span class="line">    $users</span>
+<span class="line">);</span>
+<span class="line"></span>
+<span class="line">// For numeric ranges</span>
+<span class="line">for ($i = 0; $i &lt; 10; $i++) {</span>
+<span class="line">    echo $i . PHP_EOL;</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Modifying an array while iterating it by value:</strong> Use reference iteration or build a new array.</li>
+                                        <li><strong>Using <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">for ($i = 0; $i &lt; count($arr); $i++)</code>:</strong> <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">count()</code> is evaluated every iteration. Cache it or use <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">foreach</code>.</li>
+                                        <li><strong>Leaving reference variables alive after foreach:</strong> Unset <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$item</code> after a by-reference loop to avoid accidental mutations later.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-8">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">8</span> Array Basics</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>PHP arrays are ordered hash maps. An <strong>indexed array</strong> uses integer keys starting at 0, while an <strong>associative array</strong> uses string keys. Under the hood, the Zend Engine stores arrays as packed hash tables with complex collision handling and copy-on-write semantics.</p>
+                                    <p>The modern short array syntax <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">[]</code> has fully replaced the legacy <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">array()</code> keyword. PHP 7.4 introduced the <strong>spread operator</strong> <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">...</code> for arrays, allowing arrays to be unpacked inline with integer keys. String-keyed spreads arrived in PHP 8.1.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">arrays.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">// Indexed array</span>
+<span class="line">$tags = ['php', 'alpine', 'tailwind'];</span>
+<span class="line"></span>
+<span class="line">// Associative array</span>
+<span class="line">$config = [</span>
+<span class="line">    'host' => 'localhost',</span>
+<span class="line">    'port' => 3306,</span>
+<span class="line">    'ssl' => true,</span>
+<span class="line">];</span>
+<span class="line"></span>
+<span class="line">// Array unpacking with spread operator</span>
+<span class="line">$defaults = ['timeout' => 30, 'retries' => 3];</span>
+<span class="line">$overrides = ['retries' => 5];</span>
+<span class="line">$merged = [...$defaults, ...$overrides]; // overrides win for string keys</span>
+<span class="line"></span>
+<span class="line">// Destructuring</span>
+<span class="line">['host' => $host, 'port' => $port] = $config;</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Using <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">array()</code> syntax:</strong> Use <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">[]</code>. It is shorter, faster to read, and the modern standard.</li>
+                                        <li><strong>Treating arrays as untyped bags:</strong> For structured data, prefer objects, DTOs, or enums over nested associative arrays.</li>
+                                        <li><strong>Assuming <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">+</code> merges arrays:</strong> It preserves keys from the left operand and ignores duplicates. Use spread or <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">array_merge()</code> depending on desired behavior.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-12" id="module-3" x-show="activeModule === 'module-3'" x-cloak>
+                            <h3 class="text-2xl font-bold text-github-900 dark:text-github-100 border-b border-github-200 dark:border-github-700 pb-3 mb-6">Module 3: Modular Code &amp; Built-ins</h3>
+
+                            <div class="mb-10" id="topic-9">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">9</span> Functions</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>Functions are the primary unit of reusable logic in PHP. Modern functions declare scalar, object, nullable, and union types for every parameter and return value. PHP 8.0 introduced <strong>named arguments</strong>, which allow callers to pass parameters by name rather than position, improving readability and enabling selective skipping of optional parameters.</p>
+                                    <p><strong>Variadic functions</strong> capture an arbitrary number of arguments using <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">...$values</code>. Combined with typed parameters and named arguments, variadics make APIs flexible without sacrificing type safety. Default parameter values must be constant expressions and should be placed after required parameters.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">functions.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">function buildUrl(</span>
+<span class="line">    string $path,</span>
+<span class="line">    array $query = [],</span>
+<span class="line">    bool $secure = true</span>
+<span class="line">): string {</span>
+<span class="line">    $scheme = $secure ? 'https' : 'http';</span>
+<span class="line">    $queryString = $query === [] ? '' : '?' . http_build_query($query);</span>
+<span class="line">    return "{$scheme}://example.com{$path}{$queryString}";</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">// Named arguments improve clarity</span>
+<span class="line">$url = buildUrl('/search', secure: false, query: ['q' => 'php']);</span>
+<span class="line"></span>
+<span class="line">// Variadic typed function</span>
+<span class="line">function sum(int ...$numbers): int</span>
+<span class="line">{</span>
+<span class="line">    return array_sum($numbers);</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">echo sum(1, 2, 3, 4); // 10</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Functions with no return type:</strong> Always declare return types; use <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">void</code> for procedures.</li>
+                                        <li><strong>Default parameters before required ones:</strong> PHP 8 still requires optional parameters after required ones in many cases.</li>
+                                        <li><strong>Returning mixed/ambiguous values:</strong> A function should return one predictable type. Use null or throw exceptions for errors.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-10">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">10</span> Anonymous Functions &amp; Closures</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p><strong>Closures</strong> in PHP are objects of the internal <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">Closure</code> class. They can capture variables from the surrounding scope using the <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">use</code> keyword. Captures are <strong>by value</strong> by default; prefixing with <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">&amp;</code> captures by reference.</p>
+                                    <p>PHP 7.4 introduced <strong>arrow functions</strong> (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">fn ($x) => $x * 2</code>). Arrow functions capture variables from the parent scope <strong>automatically by value</strong>. They are ideal for short, single-expression callbacks but cannot contain statements or multi-line bodies.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">closures.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">$multiplier = 3;</span>
+<span class="line"></span>
+<span class="line">// Arrow function captures $multiplier automatically</span>
+<span class="line">$scale = fn (int $value): int => $value * $multiplier;</span>
+<span class="line"></span>
+<span class="line">// Closure with explicit use, by reference</span>
+<span class="line">$counter = 0;</span>
+<span class="line">$increment = function () use (&amp;$counter): int {</span>
+<span class="line">    return ++$counter;</span>
+<span class="line">};</span>
+<span class="line"></span>
+<span class="line">$numbers = [1, 2, 3, 4];</span>
+<span class="line">$scaled = array_map($scale, $numbers); // [3, 6, 9, 12]</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Using closures for complex logic:</strong> Arrow functions are for single expressions. Use named functions or classes for complex work.</li>
+                                        <li><strong>Forgetting <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">use</code> in traditional closures:</strong> Outer variables are not automatically available inside regular closures.</li>
+                                        <li><strong>Capturing by reference unnecessarily:</strong> It can cause subtle state leaks. Capture by value unless mutation is intentional.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-11">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">11</span> Superglobals &amp; Request Handling</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>Superglobals (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$_GET</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$_POST</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$_SERVER</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$_FILES</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$_COOKIE</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$_SESSION</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$_ENV</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$_REQUEST</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$GLOBALS</code>) are associative arrays populated by the SAPI before user code runs. They are mutable and globally accessible, which makes them convenient and dangerous.</p>
+                                    <p><strong>Sanitization</strong> removes or neutralizes unwanted characters. <strong>Validation</strong> checks whether input meets business rules. They are not interchangeable. Sanitizing an email does not validate it; validating a string does not make it safe for HTML output. Modern PHP uses dedicated libraries (e.g., Symfony Validator, laminas-filter) or strict typed request objects instead of raw superglobals scattered through code.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">request.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">// Never trust raw input. Filter, validate, then cast.</span>
+<span class="line">$rawEmail = $_POST['email'] ?? '';</span>
+<span class="line">$email = filter_var($rawEmail, FILTER_VALIDATE_EMAIL);</span>
+<span class="line"></span>
+<span class="line">if ($email === false || $email === null) {</span>
+<span class="line">    http_response_code(422);</span>
+<span class="line">    echo 'Invalid email address.';</span>
+<span class="line">    exit;</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">// Escape before output</span>
+<span class="line">$safeEmail = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');</span>
+<span class="line">echo "&lt;p&gt;Registered: {$safeEmail}&lt;/p&gt;";</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Directly echoing <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$_GET</code>/<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$_POST</code> values:</strong> This is the root cause of XSS. Escape or parameterize output.</li>
+                                        <li><strong>Confusing sanitization with validation:</strong> Use validation to reject bad input, not to silently fix it.</li>
+                                        <li><strong>Using <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$_REQUEST</code>:</strong> It merges GET, POST, and COOKIE in unpredictable order. Be explicit about the source.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-12">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">12</span> State Persistence</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>PHP's shared-nothing model means no request can see another request's memory. State is persisted via <strong>sessions</strong> (server-side, identified by a session cookie) and <strong>cookies</strong> (client-side name-value pairs). <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$_SESSION</code> is populated when <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">session_start()</code> is called and serialized to a handler at the end of the request.</p>
+                                    <p>Modern session configuration must be secure: use <strong>httponly</strong>, <strong>secure</strong>, and <strong>SameSite</strong> flags; regenerate IDs on privilege escalation; store sessions in Redis or a database instead of the filesystem at scale; and never store sensitive raw data client-side in cookies.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">session.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">// Secure session cookie settings before starting</span>
+<span class="line">ini_set('session.cookie_httponly', '1');</span>
+<span class="line">ini_set('session.cookie_secure', '1');</span>
+<span class="line">ini_set('session.cookie_samesite', 'Strict');</span>
+<span class="line">ini_set('session.use_strict_mode', '1');</span>
+<span class="line">ini_set('session.use_only_cookies', '1');</span>
+<span class="line"></span>
+<span class="line">session_start();</span>
+<span class="line"></span>
+<span class="line">// After verifying credentials, rotate the session ID to prevent fixation</span>
+<span class="line">$userId = authenticateUser($_POST['email'] ?? '', $_POST['password'] ?? '');</span>
+<span class="line"></span>
+<span class="line">if ($userId !== null) {</span>
+<span class="line">    session_regenerate_id(true);</span>
+<span class="line">    $_SESSION['authenticated'] = true;</span>
+<span class="line">    $_SESSION['user_id'] = $userId;</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Sessions without <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">httponly</code>/<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">secure</code>/<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">SameSite</code>:</strong> These flags prevent XSS cookie theft and CSRF in transit.</li>
+                                        <li><strong>Not regenerating session IDs after login:</strong> Session fixation attacks hijack pre-assigned IDs.</li>
+                                        <li><strong>Storing secrets or large objects in session:</strong> Sessions should contain identifiers and small, serializable state, not raw passwords or huge arrays.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="part-2" class="mb-16">
+                        <div class="mb-12" id="module-4" x-show="activeModule === 'module-4'" x-cloak>
+                            <h3 class="text-2xl font-bold text-github-900 dark:text-github-100 border-b border-github-200 dark:border-github-700 pb-3 mb-6">Module 4: Object-Oriented PHP Deep Dive</h3>
+
+                            <div class="mb-10" id="topic-13">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">13</span> Classes &amp; Objects</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>A <strong>class</strong> is a blueprint; an <strong>object</strong> is a runtime instance. PHP classes support typed properties, methods, constants, and visibility modifiers. Visibility — <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">public</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">protected</code>, and <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">private</code> — enforces encapsulation. Modern PHP rarely exposes public properties directly; instead it uses getters, setters, or readonly properties to maintain invariants.</p>
+                                    <p>The Zend Engine stores objects as reference-counted structures. Assigning an object variable does not copy the object; it copies a handle to the same object. This is different from arrays, which are copy-on-write.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">class.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">final class User</span>
+<span class="line">{</span>
+<span class="line">    public function __construct(</span>
+<span class="line">        private string $name,</span>
+<span class="line">        private string $email,</span>
+<span class="line">    ) {}</span>
+<span class="line"></span>
+<span class="line">    public function name(): string</span>
+<span class="line">    {</span>
+<span class="line">        return $this-&gt;name;</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    public function email(): string</span>
+<span class="line">    {</span>
+<span class="line">        return $this-&gt;email;</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    public function updateEmail(string $email): void</span>
+<span class="line">    {</span>
+<span class="line">        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {</span>
+<span class="line">            throw new InvalidArgumentException('Invalid email.');</span>
+<span class="line">        }</span>
+<span class="line">        $this-&gt;email = $email;</span>
+<span class="line">    }</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Public mutable properties:</strong> Break encapsulation. Use private properties with controlled methods.</li>
+                                        <li><strong>Untyped properties:</strong> PHP 7.4+ supports typed properties. Use them.</li>
+                                        <li><strong>Massive "god classes":</strong> A class should have one reason to change. Split responsibilities.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-14">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">14</span> Modern Object Construction</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>PHP 8.0 introduced <strong>Constructor Property Promotion</strong>, allowing constructor parameters to be declared as class properties inline. This removes boilerplate and makes value objects trivial to write. PHP 8.1 added <strong>readonly properties</strong>, which can be written exactly once — typically during construction — and then become immutable.</p>
+                                    <p>Together, promotion and <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">readonly</code> make PHP's value objects (DTOs, entities, command objects) concise, type-safe, and immutable. Readonly properties can only be initialized from the declaring scope and cannot be reassigned, including via reflection after initialization.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">construction.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">final class Money</span>
+<span class="line">{</span>
+<span class="line">    public function __construct(</span>
+<span class="line">        public readonly float $amount,</span>
+<span class="line">        public readonly string $currency,</span>
+<span class="line">    ) {}</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">$price = new Money(amount: 99.99, currency: 'USD');</span>
+<span class="line">// $price-&gt;amount = 100.00; // Fatal Error: readonly property</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Manual constructor assignments:</strong> Use promotion to reduce noise.</li>
+                                        <li><strong>Mutable DTOs:</strong> If data should not change after creation, mark properties <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">readonly</code>.</li>
+                                        <li><strong>Initializing readonly properties outside the constructor:</strong> They must be assigned exactly once, before construction completes.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-15">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">15</span> Inheritance &amp; Polymorphism</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p><strong>Inheritance</strong> in PHP uses the <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">extends</code> keyword. A child class inherits public and protected members from the parent. <strong>Polymorphism</strong> allows code to operate on objects of different classes through a common interface or parent type. Method overriding lets a child class replace parent behavior, but the override must be compatible with the parent's signature (covariance/contravariance rules apply).</p>
+                                    <p>The <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">final</code> keyword prevents a class from being extended or a method from being overridden. Modern PHP uses <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">final</code> aggressively on classes that are not designed for inheritance, because inheritance is a fragile extension mechanism compared to composition.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">inheritance.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">abstract class Notification</span>
+<span class="line">{</span>
+<span class="line">    abstract public function send(string $message): void;</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">final class EmailNotification extends Notification</span>
+<span class="line">{</span>
+<span class="line">    public function send(string $message): void</span>
+<span class="line">    {</span>
+<span class="line">        echo "Sending email: {$message}\n";</span>
+<span class="line">    }</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">final class SmsNotification extends Notification</span>
+<span class="line">{</span>
+<span class="line">    public function send(string $message): void</span>
+<span class="line">    {</span>
+<span class="line">        echo "Sending SMS: {$message}\n";</span>
+<span class="line">    }</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">function notifyUser(Notification $notification, string $message): void</span>
+<span class="line">{</span>
+<span class="line">    $notification-&gt;send($message); // polymorphic dispatch</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Deep inheritance hierarchies:</strong> Prefer composition. Deep trees are hard to test and refactor.</li>
+                                        <li><strong>Non-final concrete classes without intent:</strong> If a class is not explicitly designed for extension, mark it <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">final</code>.</li>
+                                        <li><strong>Breaking Liskov Substitution:</strong> Overrides should not strengthen preconditions or weaken postconditions.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-16">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">16</span> Abstraction &amp; Interfaces</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p><strong>Abstract classes</strong> provide a partial implementation and cannot be instantiated. They are useful when related classes share common state or concrete behavior. <strong>Interfaces</strong> define a pure contract — a set of methods that implementing classes must provide. A class can implement multiple interfaces but extend only one class.</p>
+                                    <p>Modern PHP uses interfaces to decouple code from concrete implementations. Type-hinting against interfaces allows dependency injection, mocking in tests, and swapping implementations without changing callers. PHP 8.0+ added <strong>static</strong> return types and constructor signature enforcement through interfaces; interface inheritance has been supported since PHP 5.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">interfaces.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">interface Cache</span>
+<span class="line">{</span>
+<span class="line">    public function get(string $key): ?string;</span>
+<span class="line">    public function set(string $key, string $value, int $ttl): void;</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">final class InMemoryCache implements Cache</span>
+<span class="line">{</span>
+<span class="line">    /** @var array&lt;string, array{value: string, expiresAt: int}&gt; */</span>
+<span class="line">    private array $storage = [];</span>
+<span class="line"></span>
+<span class="line">    public function get(string $key): ?string</span>
+<span class="line">    {</span>
+<span class="line">        $entry = $this-&gt;storage[$key] ?? null;</span>
+<span class="line">        if ($entry === null || $entry['expiresAt'] &lt; time()) {</span>
+<span class="line">            return null;</span>
+<span class="line">        }</span>
+<span class="line">        return $entry['value'];</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    public function set(string $key, string $value, int $ttl): void</span>
+<span class="line">    {</span>
+<span class="line">        $this-&gt;storage[$key] = ['value' =&gt; $value, 'expiresAt' =&gt; time() + $ttl];</span>
+<span class="line">    }</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Type-hinting concrete classes everywhere:</strong> Depend on interfaces, not implementations.</li>
+                                        <li><strong>Fat interfaces:</strong> An interface should be small and focused. Split bloated contracts.</li>
+                                        <li><strong>Using abstract classes for pure contracts:</strong> If there is no shared implementation, use an interface.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-17">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">17</span> Traits &amp; Code Reuse</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p><strong>Traits</strong> provide horizontal code reuse. Unlike inheritance, which is vertical, a trait is a group of methods that can be inserted into multiple unrelated classes. Traits are compiled into the using class at runtime; they do not create a new type and cannot be instantiated or type-hinted.</p>
+                                    <p>Traits are useful for cross-cutting concerns such as logging, event dispatching, or timestampable behavior. However, they can introduce naming conflicts when two traits provide the same method. PHP resolves this with <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">insteadof</code> and <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">as</code> operators.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">traits.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">trait Timestampable</span>
+<span class="line">{</span>
+<span class="line">    private readonly DateTimeImmutable $createdAt;</span>
+<span class="line"></span>
+<span class="line">    public function __construct()</span>
+<span class="line">    {</span>
+<span class="line">        $this-&gt;createdAt = new DateTimeImmutable();</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    public function createdAt(): DateTimeImmutable</span>
+<span class="line">    {</span>
+<span class="line">        return $this-&gt;createdAt;</span>
+<span class="line">    }</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">final class Article</span>
+<span class="line">{</span>
+<span class="line">    use Timestampable;</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">final class Comment</span>
+<span class="line">{</span>
+<span class="line">    use Timestampable;</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Traits as a substitute for composition:</strong> If a class needs behavior, inject a collaborator instead of copy-pasting methods.</li>
+                                        <li><strong>Traits with hidden dependencies:</strong> A trait that expects certain properties or methods on the using class is fragile and hard to trace.</li>
+                                        <li><strong>Ignoring trait conflicts:</strong> Always resolve method collisions explicitly with <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">insteadof</code>.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-12" id="module-5" x-show="activeModule === 'module-5'" x-cloak>
+                            <h3 class="text-2xl font-bold text-github-900 dark:text-github-100 border-b border-github-200 dark:border-github-700 pb-3 mb-6">Module 5: Error Handling &amp; Modern Standards</h3>
+
+                            <div class="mb-10" id="topic-18">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">18</span> Defensive Programming</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>PHP errors have evolved from silent failures and legacy error levels to a robust <strong>exception</strong> model. Modern PHP code throws exceptions for exceptional conditions and catches them at appropriate boundaries. <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">try/catch/finally</code> blocks isolate failure handling, and <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">finally</code> guarantees cleanup regardless of success or failure.</p>
+                                    <p><strong>Custom exceptions</strong> extend <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">\Exception</code> or <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">\RuntimeException</code> and communicate domain-specific failures. They should be named after the problem they represent, not the layer that throws them. PHP 8.0 made the throw statement an expression, allowing constructs like <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">$value ?? throw new InvalidArgumentException()</code>.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">exceptions.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">final class PaymentFailedException extends RuntimeException</span>
+<span class="line">{</span>
+<span class="line">    public static function forInsufficientFunds(): self</span>
+<span class="line">    {</span>
+<span class="line">        return new self('Payment declined: insufficient funds.');</span>
+<span class="line">    }</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">function auditLog(string $event): void</span>
+<span class="line">{</span>
+<span class="line">    // Production: write to immutable audit store</span>
+<span class="line">    error_log("[AUDIT] {$event}");</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">function processPayment(float $amount, float $balance): void</span>
+<span class="line">{</span>
+<span class="line">    if ($amount &gt; $balance) {</span>
+<span class="line">        throw PaymentFailedException::forInsufficientFunds();</span>
+<span class="line">    }</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">try {</span>
+<span class="line">    processPayment(100.00, 50.00);</span>
+<span class="line">} catch (PaymentFailedException $e) {</span>
+<span class="line">    error_log($e-&gt;getMessage());</span>
+<span class="line">    echo 'Unable to complete payment.';</span>
+<span class="line">} finally {</span>
+<span class="line">    // Always release resources or record audit trail</span>
+<span class="line">    auditLog('payment_attempt');</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Catching <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">\Exception</code> everywhere:</strong> Catch specific exceptions. Catching the root class hides bugs.</li>
+                                        <li><strong>Swallowing exceptions silently:</strong> Empty catch blocks destroy debugging information. Log, rethrow, or translate.</li>
+                                        <li><strong>Using exceptions for normal control flow:</strong> Exceptions are for exceptional cases, not expected branches.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-19">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">19</span> Namespaces &amp; Autoloading</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p><strong>Namespaces</strong> prevent naming collisions and organize code by vendor or domain. They map directly to the filesystem via <strong>PSR-4 autoloading</strong>, the de facto standard managed by Composer. A namespace such as <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">App\Domain\User</code> corresponds to a file path like <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">src/Domain/User.php</code>.</p>
+                                    <p>The Zend Engine resolves class names lazily through the autoloader when a class is first referenced. This avoids loading unused classes and keeps bootstrap memory low. Modern code uses <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">use</code> statements for imports, grouped alphabetically, and never relies on global class names unless necessary.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">namespace.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">namespace App\Domain\User;</span>
+<span class="line"></span>
+<span class="line">use App\Shared\Email;</span>
+<span class="line">use DateTimeImmutable;</span>
+<span class="line"></span>
+<span class="line">final class User</span>
+<span class="line">{</span>
+<span class="line">    public function __construct(</span>
+<span class="line">        private readonly string $id,</span>
+<span class="line">        private readonly Email $email,</span>
+<span class="line">        private readonly DateTimeImmutable $createdAt,</span>
+<span class="line">    ) {}</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Single global namespace:</strong> All classes should live in a namespace.</li>
+                                        <li><strong>Manual <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">require</code>/<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">include</code> everywhere:</strong> Use Composer's PSR-4 autoloader.</li>
+                                        <li><strong>Namespaces that do not match directories:</strong> PSR-4 requires strict correspondence. Mismatches break autoloading.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-20">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">20</span> Composer Dependency Management</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p><strong>Composer</strong> is PHP's dependency manager and autoloader generator. <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">composer.json</code> declares project metadata, dependencies (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">require</code>), development-only dependencies (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">require-dev</code>), autoloading rules, and scripts. <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">composer.lock</code> pins exact versions and must be committed for applications to ensure reproducible builds.</p>
+                                    <p>Modern Composer usage includes PSR-4 autoloading, autoload optimization with <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">composer dump-autoload --optimize</code> or <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">--classmap-authoritative</code> in production, and strict version constraints. Libraries use semantic versioning constraints; applications pin versions via the lock file.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">composer.json</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">{</span>
+<span class="line">    "name": "acme/php-tutorial",</span>
+<span class="line">    "type": "project",</span>
+<span class="line">    "require": {</span>
+<span class="line">        "php": "&gt;=8.1",</span>
+<span class="line">        "guzzlehttp/guzzle": "^7.8",</span>
+<span class="line">        "monolog/monolog": "^3.5"</span>
+<span class="line">    },</span>
+<span class="line">    "require-dev": {</span>
+<span class="line">        "phpunit/phpunit": "^10.5",</span>
+<span class="line">        "phpstan/phpstan": "^1.10"</span>
+<span class="line">    },</span>
+<span class="line">    "autoload": {
+<span class="line">        "psr-4": {</span>
+<span class="line">            "App\\\\": "src/"</span>
+<span class="line">        }</span>
+<span class="line">    },</span>
+<span class="line">    "autoload-dev": {</span>
+<span class="line">        "psr-4": {</span>
+<span class="line">            "App\\Tests\\": "tests/"</span>
+<span class="line">        }</span>
+<span class="line">    },</span>
+<span class="line">    "config": {</span>
+<span class="line">        "sort-packages": true</span>
+<span class="line">    }</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Committing <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">vendor/</code>:</strong> It bloats the repository. Commit <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">composer.lock</code> instead.</li>
+                                        <li><strong>Loose version constraints in production:</strong> Pin dependencies and audit them for CVEs.</li>
+                                        <li><strong>Running <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">composer install</code> as root:</strong> Creates security risks. Use dedicated deploy users.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-21">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">21</span> Professional Testing</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p><strong>PHPUnit</strong> is the standard testing framework for PHP. Unit tests isolate a single class or function, verify expected behavior through assertions, and provide fast feedback during refactoring. Modern PHPUnit uses attributes (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">#[Test]</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">#[DataProvider]</code>) instead of legacy <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">@test</code> annotations.</p>
+                                    <p><strong>Mocking</strong> replaces real collaborators with test doubles to verify interactions. PHPUnit's built-in mocking or specialized libraries like Mockery let you assert that a dependency was called with expected arguments. Mock only boundaries (databases, HTTP clients, mailers), not pure value objects.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">CalculatorTest.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">namespace App\Tests;</span>
+<span class="line"></span>
+<span class="line">use App\Calculator;</span>
+<span class="line">use PHPUnit\Framework\Attributes\DataProvider;</span>
+<span class="line">use PHPUnit\Framework\Attributes\Test;</span>
+<span class="line">use PHPUnit\Framework\TestCase;</span>
+<span class="line"></span>
+<span class="line">final class CalculatorTest extends TestCase</span>
+<span class="line">{</span>
+<span class="line">    #[Test]</span>
+<span class="line">    #[DataProvider('additionProvider')]</span>
+<span class="line">    public function it_adds_numbers(int $a, int $b, int $expected): void</span>
+<span class="line">    {</span>
+<span class="line">        $calculator = new Calculator();</span>
+<span class="line"></span>
+<span class="line">        $result = $calculator-&gt;add($a, $b);</span>
+<span class="line"></span>
+<span class="line">        self::assertSame($expected, $result);</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    /** @return array&lt;string, array{int, int, int}&gt; */</span>
+<span class="line">    public static function additionProvider(): array</span>
+<span class="line">    {</span>
+<span class="line">        return [</span>
+<span class="line">            'positive' =&gt; [2, 3, 5],</span>
+<span class="line">            'negative' =&gt; [-2, -3, -5],</span>
+<span class="line">            'zero' =&gt; [0, 0, 0],</span>
+<span class="line">        ];</span>
+<span class="line">    }</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Tests that hit real databases/networks:</strong> Use repositories and mocks to keep units isolated.</li>
+                                        <li><strong>Assertions without messages:</strong> Descriptive failure messages save debugging time.</li>
+                                        <li><strong>Testing implementation details:</strong> Test behavior and outcomes, not private methods.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-12" id="module-6" x-show="activeModule === 'module-6'" x-cloak>
+                            <h3 class="text-2xl font-bold text-github-900 dark:text-github-100 border-b border-github-200 dark:border-github-700 pb-3 mb-6">Module 6: Data &amp; Web Integration</h3>
+
+                            <div class="mb-10" id="topic-22">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">22</span> Secure Database Access</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p><strong>PDO</strong> (PHP Data Objects) is the modern database abstraction layer. It provides a consistent API for multiple drivers and supports <strong>prepared statements</strong>, which separate SQL logic from data. Prepared statements eliminate SQL injection when used correctly because bound values are never interpolated into the query string.</p>
+                                    <p>Modern database code uses PDO with explicit error mode <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">ERRMODE_EXCEPTION</code>, fetch modes mapped to classes or associative arrays, and transactions for multi-step operations. Raw queries are wrapped in repository classes, and credentials are injected via environment variables, never hardcoded.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">pdo.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">// getenv() is more reliable than $_ENV across php.ini configurations</span>
+<span class="line">$dsn = sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', getenv('DB_HOST'), getenv('DB_NAME'));</span>
+<span class="line">$pdo = new PDO($dsn, getenv('DB_USER'), getenv('DB_PASS'), [</span>
+<span class="line">    PDO::ATTR_ERRMODE =&gt; PDO::ERRMODE_EXCEPTION,</span>
+<span class="line">    PDO::ATTR_DEFAULT_FETCH_MODE =&gt; PDO::FETCH_ASSOC,</span>
+<span class="line">    PDO::ATTR_EMULATE_PREPARES =&gt; false, // use real prepared statements</span>
+<span class="line">]);</span>
+<span class="line"></span>
+<span class="line">$email = $_POST['email'] ?? '';</span>
+<span class="line">$stmt = $pdo-&gt;prepare('SELECT id, name FROM users WHERE email = :email');</span>
+<span class="line">$stmt-&gt;execute([':email' =&gt; $email]);</span>
+<span class="line">$user = $stmt-&gt;fetch();</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>String concatenation into SQL:</strong> Never do <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">"WHERE id = $id"</code>. Always bind.</li>
+                                        <li><strong>Emulated prepares left on:</strong> Set <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">ATTR_EMULATE_PREPARES =&gt; false</code> for real DB-side parameterization.</li>
+                                        <li><strong>Credentials in source control:</strong> Use environment variables or secret managers.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-23">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">23</span> Advanced Data Structuring</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>Modern PHP provides strong tools for structured data. <strong>JSON</strong> encoding/decoding uses <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">json_encode()</code> and <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">json_decode()</code> with flags such as <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">JSON_THROW_ON_ERROR</code> for exception-based error handling. <strong>Enums</strong>, introduced in PHP 8.1, allow defining a closed set of named values, optionally backed by scalar values (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">int</code> or <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">string</code>).</p>
+                                    <p>For date and time, modern PHP uses <strong><code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">DateTimeImmutable</code></strong> instead of mutable <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">DateTime</code>. Immutable dates prevent accidental mutations when passed between functions or stored in aggregates.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">data.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">enum Status: string</span>
+<span class="line">{</span>
+<span class="line">    case Draft = 'draft';</span>
+<span class="line">    case Published = 'published';</span>
+<span class="line">    case Archived = 'archived';</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">$payload = [</span>
+<span class="line">    'id' =&gt; 1,</span>
+<span class="line">    'status' =&gt; Status::Published-&gt;value,</span>
+<span class="line">    'createdAt' =&gt; (new DateTimeImmutable())-&gt;format(DateTimeInterface::ATOM),</span>
+<span class="line">];</span>
+<span class="line"></span>
+<span class="line">$json = json_encode($payload, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);</span>
+<span class="line">$decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);</span>
+<span class="line">$status = Status::from($decoded['status']);</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Using magic strings instead of enums:</strong> Enums make invalid states unrepresentable.</li>
+                                        <li><strong>Ignoring <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">json_last_error()</code>:</strong> Use <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">JSON_THROW_ON_ERROR</code> to handle failures via exceptions.</li>
+                                        <li><strong>Mutating DateTime objects shared across code:</strong> Prefer <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">DateTimeImmutable</code>.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-24">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">24</span> HTTP &amp; REST Clients</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>PHP's <strong>cURL</strong> extension is powerful but verbose and error-prone. Modern PHP applications typically use higher-level HTTP clients. <strong>Guzzle</strong> is the most popular and implements PSR-7 (HTTP messages), PSR-17 (HTTP factories), and PSR-18 (HTTP client) standards. PSR-18 abstracts the client so that code can be tested with mock HTTP clients and swapped without changes.</p>
+                                    <p>Modern HTTP code sets explicit timeouts, handles exceptions, validates status codes, and never trusts remote data. JSON payloads are decoded with error checking, and credentials are passed via headers or environment, never logged.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">http_client.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">use GuzzleHttp\Client;</span>
+<span class="line">use GuzzleHttp\Exception\RequestException;</span>
+<span class="line"></span>
+<span class="line">$client = new Client([</span>
+<span class="line">    'base_uri' =&gt; 'https://api.example.com/',</span>
+<span class="line">    'timeout' =&gt; 5.0,</span>
+<span class="line">    'headers' =&gt; [</span>
+<span class="line">        'Accept' =&gt; 'application/json',</span>
+<span class="line">        'Authorization' =&gt; 'Bearer ' . getenv('API_TOKEN'),</span>
+<span class="line">    ],</span>
+<span class="line">]);</span>
+<span class="line"></span>
+<span class="line">try {</span>
+<span class="line">    $response = $client-&gt;get('users/1');</span>
+<span class="line">    $user = json_decode($response-&gt;getBody()-&gt;getContents(), true, 512, JSON_THROW_ON_ERROR);</span>
+<span class="line">} catch (RequestException $e) {</span>
+<span class="line">    error_log('HTTP request failed: ' . $e-&gt;getMessage());</span>
+<span class="line">    throw new RuntimeException('Unable to fetch user data.');</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Raw cURL without error handling:</strong> Use a robust client and always catch exceptions.</li>
+                                        <li><strong>No request timeouts:</strong> Missing timeouts allow requests to hang indefinitely.</li>
+                                        <li><strong>Trusting remote JSON blindly:</strong> Validate the decoded structure before using it.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="part-3" class="mb-16">
+                        <div class="mb-12" id="module-7" x-show="activeModule === 'module-7'" x-cloak>
+                            <h3 class="text-2xl font-bold text-github-900 dark:text-github-100 border-b border-github-200 dark:border-github-700 pb-3 mb-6">Module 7: Metaprogramming &amp; Design Patterns</h3>
+
+                            <div class="mb-10" id="topic-25">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">25</span> Reflection API &amp; Attributes</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>The <strong>Reflection API</strong> allows PHP code to inspect classes, methods, properties, and parameters at runtime. Reflection is used by frameworks, serializers, dependency injection containers, and test runners. However, it is slower than direct code access and should be cached in production.</p>
+                                    <p><strong>Attributes</strong> (PHP 8.0+) replace the legacy docblock annotation pattern. They are native metadata tags declared with <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">#[Attribute]</code> and attached to classes, methods, properties, or parameters. Attributes are parsed by the Zend Engine and accessible via reflection without string parsing of comments.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">attributes.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">#[Attribute(Attribute::TARGET_METHOD)]</span>
+<span class="line">final class Route</span>
+<span class="line">{</span>
+<span class="line">    public function __construct(public readonly string $path) {}</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">final class UserController</span>
+<span class="line">{</span>
+<span class="line">    #[Route('/users')]</span>
+<span class="line">    public function index(): array</span>
+<span class="line">    {</span>
+<span class="line">        return [];</span>
+<span class="line">    }</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">$reflector = new ReflectionClass(UserController::class);</span>
+<span class="line">foreach ($reflector-&gt;getMethods() as $method) {</span>
+<span class="line">    $attributes = $method-&gt;getAttributes(Route::class);</span>
+<span class="line">    foreach ($attributes as $attribute) {</span>
+<span class="line">        $route = $attribute-&gt;newInstance();</span>
+<span class="line">        echo $route-&gt;path;</span>
+<span class="line">    }</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Parsing docblocks manually:</strong> Use native attributes instead of regex on comments.</li>
+                                        <li><strong>Heavy reflection in hot paths:</strong> Reflect once, cache metadata, reuse it.</li>
+                                        <li><strong>Attributes with side effects:</strong> Attributes should hold metadata. Let the application code act on it.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-26">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">26</span> Advanced OOP Mechanics</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p><strong>Magic methods</strong> intercept language-level operations. <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">__get</code> and <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">__set</code> handle inaccessible property access. <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">__call</code> intercepts undefined method calls. <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">__clone</code> controls object copying. These are powerful but should be used sparingly because they break static analysis, IDE autocompletion, and explicit contracts.</p>
+                                    <p><strong>Magic constants</strong> such as <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">__DIR__</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">__FILE__</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">__CLASS__</code>, and <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">__METHOD__</code> provide context at compile time. Use <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">::class</code> for class name resolution instead of hardcoded strings.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">magic.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">final class Config</span>
+<span class="line">{</span>
+<span class="line">    /** @var array&lt;string, mixed&gt; */</span>
+<span class="line">    private array $values = [];</span>
+<span class="line"></span>
+<span class="line">    public function __get(string $name): mixed</span>
+<span class="line">    {</span>
+<span class="line">        return $this-&gt;values[$name] ?? throw new OutOfBoundsException("Unknown config: {$name}");</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    public function __set(string $name, mixed $value): void</span>
+<span class="line">    {</span>
+<span class="line">        $this-&gt;values[$name] = $value;</span>
+<span class="line">    }</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">$config = new Config();</span>
+<span class="line">$config-&gt;timeout = 30;</span>
+<span class="line">echo $config-&gt;timeout;</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Magic methods instead of explicit APIs:</strong> Prefer typed methods and properties when possible.</li>
+                                        <li><strong>Returning null from <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">__get</code> silently:</strong> It masks bugs. Throw exceptions for invalid access.</li>
+                                        <li><strong>Forgetting to implement <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">__clone</code> for deep copies:</strong> Default clone is shallow; nested objects remain shared.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-27">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">27</span> Enterprise Design Patterns</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p><strong>Dependency Injection (DI)</strong> is the practice of supplying a class's collaborators from the outside rather than letting the class create them. It enables testability, loose coupling, and composition over inheritance. A <strong>DI container</strong> automates object graph construction and lifecycle management.</p>
+                                    <p>The <strong>Singleton</strong> pattern ensures only one instance exists, but it is often abused as a global state container. Modern PHP prefers container-managed services over hand-rolled singletons. The <strong>Strategy</strong> pattern defines a family of interchangeable algorithms behind a common interface, making behavior selectable at runtime.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">patterns.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">interface PaymentProcessor</span>
+<span class="line">{</span>
+<span class="line">    public function pay(float $amount): void;</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">final class StripeProcessor implements PaymentProcessor</span>
+<span class="line">{</span>
+<span class="line">    public function pay(float $amount): void</span>
+<span class="line">    {</span>
+<span class="line">        echo "Charging \${$amount} via Stripe\n";</span>
+<span class="line">    }</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">final class Checkout</span>
+<span class="line">{</span>
+<span class="line">    public function __construct(private PaymentProcessor $processor) {}</span>
+<span class="line"></span>
+<span class="line">    public function completeOrder(float $amount): void</span>
+<span class="line">    {</span>
+<span class="line">        $this-&gt;processor-&gt;pay($amount);</span>
+<span class="line">    }</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">// Inject the strategy</span>
+<span class="line">$checkout = new Checkout(new StripeProcessor());</span>
+<span class="line">$checkout-&gt;completeOrder(49.99);</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Service locators and static facades:</strong> They hide dependencies. Use constructor injection.</li>
+                                        <li><strong>DI containers referenced inside domain code:</strong> The container belongs at the composition root, not in business logic.</li>
+                                        <li><strong>Singletons holding mutable state:</strong> A singleton is not a global variable. Keep it stateless or use the container.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-12" id="module-8" x-show="activeModule === 'module-8'" x-cloak>
+                            <h3 class="text-2xl font-bold text-github-900 dark:text-github-100 border-b border-github-200 dark:border-github-700 pb-3 mb-6">Module 8: Memory, Streams, &amp; Optimization</h3>
+
+                            <div class="mb-10" id="topic-28">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">28</span> Streams &amp; File System</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p><strong>Streams</strong> in PHP are a unified way to read from and write to files, network sockets, compressed archives, and more. The stream wrapper abstraction lets you use familiar file functions on diverse sources. For large files, loading everything into memory is wasteful and can exhaust <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">memory_limit</code>.</p>
+                                    <p><strong>Generators</strong> (functions using <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">yield</code>) let you iterate over large datasets one item at a time. They preserve memory by suspending execution between values. Combined with streams, generators are the canonical PHP pattern for processing massive CSVs, logs, or result sets without loading them entirely into RAM.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">streams.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">/** @return Generator&lt;int, string&gt; */</span>
+<span class="line">function readLargeFile(string $path): Generator</span>
+<span class="line">{</span>
+<span class="line">    $handle = fopen($path, 'rb');</span>
+<span class="line">    if ($handle === false) {</span>
+<span class="line">        throw new RuntimeException("Unable to open {$path}");</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    try {</span>
+<span class="line">        while (($line = fgets($handle)) !== false) {</span>
+<span class="line">            yield trim($line);</span>
+<span class="line">        }</span>
+<span class="line">    } finally {</span>
+<span class="line">        fclose($handle);</span>
+<span class="line">    }</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">foreach (readLargeFile('/var/log/app.log') as $line) {</span>
+<span class="line">    if (str_contains($line, 'ERROR')) {</span>
+<span class="line">        echo $line . PHP_EOL;</span>
+<span class="line">    }</span>
+<span class="line">}</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong><code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">file_get_contents()</code> on multi-gigabyte files:</strong> It loads the entire file into memory. Use streams and generators.</li>
+                                        <li><strong>Forgetting to close handles:</strong> Always close streams, preferably with <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">try/finally</code>.</li>
+                                        <li><strong>Building giant arrays from queries:</strong> Iterate with generators or pagination.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-29">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">29</span> Memory Management &amp; OPcache</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>The <strong>Zend Engine</strong> compiles PHP scripts into bytecode (opcodes), executes them on a virtual machine, and manages memory through reference counting with a cycle-collecting garbage collector. Objects and arrays are reference-counted; when the count drops to zero, memory is reclaimed. Circular references are detected by the garbage collector.</p>
+                                    <p><strong>OPcache</strong> stores compiled bytecode in shared memory so that PHP does not recompile files on every request. It is the single most important performance extension for production PHP. PHP 8.0+ also includes a <strong>JIT (Just-In-Time)</strong> compiler that translates hot bytecode into native machine code, significantly improving CPU-bound workloads.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">opcache.ini</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">; OPcache production tuning</span>
+<span class="line">opcache.enable=1</span>
+<span class="line">opcache.enable_cli=0 ; usually disabled for CLI</span>
+<span class="line">opcache.memory_consumption=256</span>
+<span class="line">opcache.interned_strings_buffer=16</span>
+<span class="line">opcache.max_accelerated_files=20000</span>
+<span class="line">opcache.validate_timestamps=0 ; disable in production; reload on deploy</span>
+<span class="line"></span>
+<span class="line">; JIT for PHP 8+</span>
+<span class="line">opcache.jit=tracing</span>
+<span class="line">opcache.jit_buffer_size=128M</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Running production without OPcache:</strong> Every request recompiles source. This is a massive waste.</li>
+                                        <li><strong>Holding references to large objects unnecessarily:</strong> Unset or narrow variable scope to allow garbage collection.</li>
+                                        <li><strong>Enabling <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">validate_timestamps</code> in production:</strong> It adds filesystem checks. Restart PHP-FPM on deploy instead.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-30">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">30</span> Security Hardening</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>PHP security is a stack-wide concern. <strong>Password hashing</strong> must use <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">password_hash()</code> with <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">PASSWORD_DEFAULT</code>, which automatically upgrades to the current best algorithm (currently bcrypt). <strong>XSS prevention</strong> requires escaping all output based on context: HTML, JavaScript, CSS, URL, or HTML attribute.</p>
+                                    <p><strong>CSRF protection</strong> validates that state-changing requests originated from your application by requiring a token tied to the user's session. <strong>Secure headers</strong> such as <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">Content-Security-Policy</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">X-Frame-Options</code>, and <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">Strict-Transport-Security</code> reduce the impact of injection and clickjacking.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">security.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">// Hash a password</span>
+<span class="line">$hash = password_hash($plainPassword, PASSWORD_DEFAULT);</span>
+<span class="line"></span>
+<span class="line">// Verify on login</span>
+<span class="line">if (password_verify($plainPassword, $hash)) {</span>
+<span class="line">    if (password_needs_rehash($hash, PASSWORD_DEFAULT)) {</span>
+<span class="line">        $hash = password_hash($plainPassword, PASSWORD_DEFAULT);</span>
+<span class="line">        // store updated hash</span>
+<span class="line">    }</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">// Escape output</span>
+<span class="line">$safe = htmlspecialchars($userInput, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');</span>
+<span class="line">echo "&lt;p&gt;{$safe}&lt;/p&gt;";</span>
+<span class="line"></span>
+<span class="line">// Secure headers</span>
+<span class="line">header('Content-Security-Policy: default-src \'self\'');</span>
+<span class="line">header('X-Frame-Options: DENY');</span>
+<span class="line">header('Strict-Transport-Security: max-age=31536000; includeSubDomains');</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Storing passwords with md5/sha1:</strong> These are broken. Use <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">password_hash</code>.</li>
+                                        <li><strong>Escaping output once and reusing it everywhere:</strong> Escape at the render boundary, in the correct context.</li>
+                                        <li><strong>No CSRF tokens on state-changing forms:</strong> Every POST/PUT/DELETE must validate a session-bound token.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-12" id="module-9" x-show="activeModule === 'module-9'" x-cloak>
+                            <h3 class="text-2xl font-bold text-github-900 dark:text-github-100 border-b border-github-200 dark:border-github-700 pb-3 mb-6">Module 9: High-Performance PHP &amp; Deployment</h3>
+
+                            <div class="mb-10" id="topic-31">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">31</span> Asynchronous &amp; Event-Driven PHP</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>Traditional PHP is synchronous and request-bound, but the ecosystem now supports asynchronous and event-driven programming. PHP 8.1 introduced <strong>fibers</strong>, lightweight cooperative threads that allow code to suspend and resume execution. Fibers are low-level primitives; most applications use them through libraries like <strong>Amphp v3</strong> or <strong>ReactPHP</strong>.</p>
+                                    <p><strong>Swoole</strong> and <strong>FrankenPHP</strong> take a different approach by providing a long-running application server that keeps PHP bootstrapped across requests. This dramatically reduces bootstrap overhead and enables persistent connections, but it requires careful state management because the shared-nothing assumption no longer holds.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">async.php</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">&lt;?php</span>
+<span class="line"></span>
+<span class="line">declare(strict_types=1);</span>
+<span class="line"></span>
+<span class="line">// Fibers allow suspending and resuming execution</span>
+<span class="line">$fiber = new Fiber(function (): int {</span>
+<span class="line">    echo "Fiber started\n";</span>
+<span class="line">    Fiber::suspend('paused');</span>
+<span class="line">    echo "Fiber resumed\n";</span>
+<span class="line"></span>
+<span class="line">    return 42;</span>
+<span class="line">});</span>
+<span class="line"></span>
+<span class="line">$value = $fiber-&gt;start();</span>
+<span class="line">echo "Got from fiber: {$value}\n";</span>
+<span class="line"></span>
+<span class="line">$result = $fiber-&gt;resume();</span>
+<span class="line">echo "Fiber returned: {$result}\n";</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Treating async PHP like Node.js:</strong> PHP fibers are cooperative; blocking I/O still blocks unless the runtime handles it.</li>
+                                        <li><strong>Storing request state in globals under Swoole:</strong> Long-running servers share memory. Use request-scoped containers.</li>
+                                        <li><strong>Adding async complexity where it is not needed:</strong> Most CRUD applications do not need fibers; traditional PHP-FPM scales well.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-10" id="topic-32">
+                                <h4 class="text-xl font-bold text-github-900 dark:text-github-100 flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-php-100 text-php-700 text-sm font-bold dark:bg-php-900/30 dark:text-php-300">32</span> Production Deployment &amp; Benchmarking</h4>
+                                <div class="mt-4 space-y-4 text-github-700 dark:text-github-300 leading-relaxed">
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100">Conceptual Explanation</h5>
+                                    <p>Modern PHP deployment is stateless and automated. Application code is built into a container or package, dependencies are installed from a pinned lock file, and configuration is injected via environment variables. <strong>PHP-FPM tuning</strong> involves setting the correct pool manager type (<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">static</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">dynamic</code>, or <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">ondemand</code>), <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">pm.max_children</code>, and request timeouts to match available memory and traffic patterns.</p>
+                                    <p><strong>Benchmarking</strong> should be done under realistic load with tools like <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">wrk</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">k6</code>, or <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">ab</code>. Profiling tools such as <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">Xdebug</code> (development), <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">Tideways</code>, <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">Blackfire</code>, or <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">perf</code>/<code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">pprof</code> reveal actual bottlenecks. Metrics via StatsD or Prometheus track latency, throughput, and error rates in production.</p>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Idiomatic Code Example</h5>
+                                    <div class="rounded-lg bg-github-900 overflow-hidden text-sm my-4">
+                                        <div class="flex items-center justify-between px-4 py-2 bg-github-800"><span class="text-github-300 font-mono text-xs">php-fpm-pool.conf</span><button @click="copyCode($el)" class="text-xs text-github-200 hover:text-white">Copy</button></div>
+<pre class="code-block p-4 font-mono text-github-100 overflow-x-auto"><code class="block"><span class="line">[www]</span>
+<span class="line">user = www-data</span>
+<span class="line">group = www-data</span>
+<span class="line">listen = /run/php/php8.2-fpm.sock</span>
+<span class="line"></span>
+<span class="line">; Dynamic pool scales with traffic</span>
+<span class="line">pm = dynamic</span>
+<span class="line">pm.max_children = 50</span>
+<span class="line">pm.start_servers = 10</span>
+<span class="line">pm.min_spare_servers = 5</span>
+<span class="line">pm.max_spare_servers = 20</span>
+<span class="line">pm.max_requests = 1000 ; recycle workers to control memory leaks</span>
+<span class="line"></span>
+<span class="line">; Slow log for profiling</span>
+<span class="line">request_slowlog_timeout = 2s</span>
+<span class="line">slowlog = /var/log/php/slow.log</span></code></pre>
+                                    </div>
+
+                                    <h5 class="font-semibold text-github-900 dark:text-github-100 pt-4">Common Anti-Patterns &amp; Mistakes</h5>
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        <li><strong>Stateful servers with local file uploads or sessions:</strong> Store sessions in Redis and files in object storage.</li>
+                                        <li><strong>Guessing at FPM pool sizes:</strong> Calculate <code class="bg-github-100 dark:bg-github-800 dark:text-github-200 px-1 py-0.5 rounded text-sm font-mono">max_children</code> from available RAM and average request memory.</li>
+                                        <li><strong>Profiling only in development:</strong> Production traces under real load reveal different bottlenecks than synthetic tests.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                </article>
+
+                <!-- Module pagination -->
+                <nav class="mt-10 sm:mt-16 border-t border-github-200 pt-8 dark:border-github-800" aria-label="Module pagination">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button
+                            x-show="previousModule"
+                            @click="goToPreviousModule()"
+                            class="flex-1 flex items-center justify-start gap-3 rounded-xl border border-github-200 bg-white px-5 py-4 text-left shadow-sm transition hover:border-php-300 hover:bg-php-50 dark:border-github-700 dark:bg-github-900 dark:hover:border-php-700 dark:hover:bg-php-900/20"
+                        >
+                            <svg class="h-5 w-5 flex-shrink-0 text-github-400 dark:text-github-500 dark:text-github-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            <div>
+                                <span class="block text-xs font-medium uppercase tracking-wider text-github-500 dark:text-github-400">Previous module</span>
+                                <span class="block text-base font-semibold text-github-900 dark:text-github-100" x-text="previousModule ? previousModule.title : ''"></span>
+                            </div>
+                        </button>
+                        <button
+                            x-show="nextModule"
+                            @click="goToNextModule()"
+                            class="flex-1 flex items-center justify-end gap-3 rounded-xl border border-github-200 bg-white px-5 py-4 text-right shadow-sm transition hover:border-php-300 hover:bg-php-50 dark:border-github-700 dark:bg-github-900 dark:hover:border-php-700 dark:hover:bg-php-900/20"
+                        >
+                            <div>
+                                <span class="block text-xs font-medium uppercase tracking-wider text-github-500 dark:text-github-400">Next module</span>
+                                <span class="block text-base font-semibold text-github-900 dark:text-github-100" x-text="nextModule ? nextModule.title : ''"></span>
+                            </div>
+                            <svg class="h-5 w-5 flex-shrink-0 text-github-400 dark:text-github-500 dark:text-github-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </nav>
+
+                <!-- Scroll to top button -->
+                <button
+                    x-show="showScrollTop"
+                    @click="scrollToTop()"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 translate-y-2"
+                    class="fixed bottom-28 right-4 z-40 rounded-full bg-php-600 p-3 text-white shadow-lg hover:bg-php-700 focus:outline-none focus:ring-2 focus:ring-php-400 focus:ring-offset-2 dark:focus:ring-offset-github-900 sm:bottom-32 sm:right-8"
+                    aria-label="Scroll to top"
+                >
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                </button>
+
+                <footer class="mt-10 sm:mt-16 border-t border-github-200 pt-8 text-sm text-github-500 dark:border-github-800 dark:text-github-400">
+                    <p>Built for modern PHP engineers. Prefer strict types, validate at boundaries, and never trust user input.</p>
+                </footer>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function phpGuide() {
+            return {
+                sidebarOpen: false,
+                activeTopic: 'topic-1',
+                openModules: ['module-1'],
+                darkMode: false,
+                showScrollTop: false,
+                parts: [
+                    {
+                        title: 'Part 1: Beginner',
+                        modules: [
+                            { id: 'module-1', title: 'Module 1: Environment & Strict Foundations', topics: [
+                                { id: 'topic-1', number: 1, title: 'The Modern PHP Ecosystem' },
+                                { id: 'topic-2', number: 2, title: 'Variables, Scope, & Dynamic Typing' },
+                                { id: 'topic-3', number: 3, title: 'Data Types & Strict Types' },
+                                { id: 'topic-4', number: 4, title: 'Output & String Manipulation' }
+                            ]},
+                            { id: 'module-2', title: 'Module 2: Operators & Control Structures', topics: [
+                                { id: 'topic-5', number: 5, title: 'Operators & Comparisons' },
+                                { id: 'topic-6', number: 6, title: 'Control Flow' },
+                                { id: 'topic-7', number: 7, title: 'Loop Constructs' },
+                                { id: 'topic-8', number: 8, title: 'Array Basics' }
+                            ]},
+                            { id: 'module-3', title: 'Module 3: Modular Code & Built-ins', topics: [
+                                { id: 'topic-9', number: 9, title: 'Functions' },
+                                { id: 'topic-10', number: 10, title: 'Anonymous Functions & Closures' },
+                                { id: 'topic-11', number: 11, title: 'Superglobals & Request Handling' },
+                                { id: 'topic-12', number: 12, title: 'State Persistence' }
+                            ]}
+                        ]
+                    },
+                    {
+                        title: 'Part 2: Intermediate',
+                        modules: [
+                            { id: 'module-4', title: 'Module 4: Object-Oriented PHP Deep Dive', topics: [
+                                { id: 'topic-13', number: 13, title: 'Classes & Objects' },
+                                { id: 'topic-14', number: 14, title: 'Modern Object Construction' },
+                                { id: 'topic-15', number: 15, title: 'Inheritance & Polymorphism' },
+                                { id: 'topic-16', number: 16, title: 'Abstraction & Interfaces' },
+                                { id: 'topic-17', number: 17, title: 'Traits & Code Reuse' }
+                            ]},
+                            { id: 'module-5', title: 'Module 5: Error Handling & Modern Standards', topics: [
+                                { id: 'topic-18', number: 18, title: 'Defensive Programming' },
+                                { id: 'topic-19', number: 19, title: 'Namespaces & Autoloading' },
+                                { id: 'topic-20', number: 20, title: 'Composer Dependency Management' },
+                                { id: 'topic-21', number: 21, title: 'Professional Testing' }
+                            ]},
+                            { id: 'module-6', title: 'Module 6: Data & Web Integration', topics: [
+                                { id: 'topic-22', number: 22, title: 'Secure Database Access' },
+                                { id: 'topic-23', number: 23, title: 'Advanced Data Structuring' },
+                                { id: 'topic-24', number: 24, title: 'HTTP & REST Clients' }
+                            ]}
+                        ]
+                    },
+                    {
+                        title: 'Part 3: Advanced',
+                        modules: [
+                            { id: 'module-7', title: 'Module 7: Metaprogramming & Design Patterns', topics: [
+                                { id: 'topic-25', number: 25, title: 'Reflection API & Attributes' },
+                                { id: 'topic-26', number: 26, title: 'Advanced OOP Mechanics' },
+                                { id: 'topic-27', number: 27, title: 'Enterprise Design Patterns' }
+                            ]},
+                            { id: 'module-8', title: 'Module 8: Memory, Streams, & Optimization', topics: [
+                                { id: 'topic-28', number: 28, title: 'Streams & File System' },
+                                { id: 'topic-29', number: 29, title: 'Memory Management & OPcache' },
+                                { id: 'topic-30', number: 30, title: 'Security Hardening' }
+                            ]},
+                            { id: 'module-9', title: 'Module 9: High-Performance PHP & Deployment', topics: [
+                                { id: 'topic-31', number: 31, title: 'Asynchronous & Event-Driven PHP' },
+                                { id: 'topic-32', number: 32, title: 'Production Deployment & Benchmarking' }
+                            ]}
+                        ]
+                    }
+                ],
+                get activeModule() {
+                    return this.findModuleForTopic(this.activeTopic);
+                },
+                get flatModules() {
+                    return this.parts.flatMap(part => part.modules);
+                },
+                get currentModuleIndex() {
+                    return this.flatModules.findIndex(m => m.id === this.activeModule);
+                },
+                get previousModule() {
+                    const idx = this.currentModuleIndex;
+                    return idx > 0 ? this.flatModules[idx - 1] : null;
+                },
+                get nextModule() {
+                    const idx = this.currentModuleIndex;
+                    return idx >= 0 && idx < this.flatModules.length - 1 ? this.flatModules[idx + 1] : null;
+                },
+                init() {
+                    this.initDarkMode();
+
+                    this.$watch('activeTopic', (value) => {
+                        const moduleId = this.findModuleForTopic(value);
+                        if (moduleId && !this.openModules.includes(moduleId)) {
+                            this.openModules.push(moduleId);
+                        }
+                    });
+
+                    this.$watch('darkMode', (value) => {
+                        localStorage.setItem('php-guide-dark-mode', value ? 'dark' : 'light');
+                        document.documentElement.classList.toggle('dark', value);
+                    });
+
+                    window.addEventListener('hashchange', () => this.handleHash());
+                    window.addEventListener('scroll', () => {
+                        this.showScrollTop = window.scrollY > 400;
+                    });
+
+                    if (!window.location.hash) {
+                        history.replaceState(null, '', '#topic-1');
+                    }
+                    this.handleHash();
+                },
+                initDarkMode() {
+                    const stored = localStorage.getItem('php-guide-dark-mode');
+                    if (stored) {
+                        this.darkMode = stored === 'dark';
+                    } else {
+                        this.darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    }
+                    document.documentElement.classList.toggle('dark', this.darkMode);
+                },
+                toggleDarkMode() {
+                    this.darkMode = !this.darkMode;
+                },
+                handleHash() {
+                    const hash = window.location.hash.replace('#', '');
+                    if (!hash) return;
+                    const element = document.getElementById(hash);
+                    if (element) {
+                        this.activeTopic = hash;
+                        setTimeout(() => {
+                            element.scrollIntoView({ behavior: 'smooth' });
+                            if (this.sidebarOpen) this.sidebarOpen = false;
+                        }, 50);
+                    }
+                },
+                goToModule(moduleId) {
+                    const module = this.flatModules.find(m => m.id === moduleId);
+                    if (module && module.topics.length > 0) {
+                        const firstTopic = module.topics[0].id;
+                        window.location.hash = firstTopic;
+                    }
+                },
+                goToPreviousModule() {
+                    if (this.previousModule) this.goToModule(this.previousModule.id);
+                },
+                goToNextModule() {
+                    if (this.nextModule) this.goToModule(this.nextModule.id);
+                },
+                scrollToTop() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                },
+                findModuleForTopic(topicId) {
+                    for (const part of this.parts) {
+                        for (const module of part.modules) {
+                            if (module.topics.some(t => t.id === topicId)) return module.id;
+                        }
+                    }
+                    return null;
+                },
+                toggleModule(moduleId) {
+                    if (this.openModules.includes(moduleId)) {
+                        this.openModules = this.openModules.filter(id => id !== moduleId);
+                    } else {
+                        this.openModules.push(moduleId);
+                    }
+                },
+                isModuleOpen(moduleId) {
+                    return this.openModules.includes(moduleId);
+                },
+                copyCode(button) {
+                    const lines = button.closest('.rounded-lg').querySelectorAll('pre .line');
+                    const code = Array.from(lines).map(line => line.textContent).join('\n');
+                    navigator.clipboard.writeText(code).then(() => {
+                        const original = button.innerText;
+                        button.innerText = 'Copied!';
+                        setTimeout(() => button.innerText = original, 1500);
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
