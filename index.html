@@ -4,8 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modern PHP 8.x Masterclass — Complete Guide</title>
-    <meta name="description" content="A comprehensive, modern guide to PHP 8.x programming covering beginner to advanced topics.">
+    <meta name="description" content="A comprehensive, modern guide to PHP 8.x programming from core fundamentals to enterprise engineering and production deployment.">
+    <link rel="canonical" href="https://azhar25git.github.io/php8-tutorial/">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Search engine metadata -->
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="author" content="azhar25git">
+    <meta name="keywords" content="PHP 8, PHP 8.x, PHP tutorial, modern PHP, PHP guide, PHP programming, PHP-FPM, Composer, PHPUnit, PDO, web development">
+    <meta name="theme-color" content="#4c1d95" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1b1f24" media="(prefers-color-scheme: dark)">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Modern PHP 8.x Masterclass — Complete Guide">
+    <meta property="og:description" content="A comprehensive, modern guide to PHP 8.x programming from core fundamentals to enterprise engineering and production deployment.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://azhar25git.github.io/php8-tutorial/">
+    <meta property="og:site_name" content="Modern PHP 8.x Masterclass">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://azhar25git.github.io/php8-tutorial/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Modern PHP 8.x Masterclass branding">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Modern PHP 8.x Masterclass — Complete Guide">
+    <meta name="twitter:description" content="A comprehensive, modern guide to PHP 8.x programming from core fundamentals to enterprise engineering and production deployment.">
+    <meta name="twitter:image" content="https://azhar25git.github.io/php8-tutorial/og-image.png">
+    <meta name="twitter:image:alt" content="Modern PHP 8.x Masterclass branding">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Modern PHP 8.x Masterclass",
+        "url": "https://azhar25git.github.io/php8-tutorial/",
+        "description": "A comprehensive, modern guide to PHP 8.x programming from core fundamentals to enterprise engineering and production deployment."
+    }
+    </script>
     <script>
         (function () {
             const stored = localStorage.getItem('php-guide-dark-mode');
@@ -77,6 +115,7 @@
                     <span class="font-mono text-xs bg-github-100 dark:bg-github-800 px-2 py-1 rounded">32 Topics</span>
                     <span class="font-mono text-xs bg-github-100 dark:bg-github-800 px-2 py-1 rounded">9 Modules</span>
                     <a href="https://www.php.net/" target="_blank" rel="noopener" class="hover:text-github-900 dark:hover:text-github-200">php.net ↗</a>
+                    <a href="https://github.com/azhar25git/php8-tutorial" target="_blank" rel="noopener" class="hover:text-github-900 dark:hover:text-github-200">GitHub ↗</a>
                 </div>
                 <button @click="toggleDarkMode()" class="p-2 rounded-md hover:bg-github-100 dark:hover:bg-github-800" :aria-label="darkMode ? 'Switch to light mode' : 'Switch to dark mode'">
                     <svg x-show="!darkMode" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
@@ -133,6 +172,7 @@
                             <span class="inline-flex items-center rounded-full bg-github-50 px-3 py-1 text-xs font-medium text-github-600 ring-1 ring-inset ring-github-500/10 dark:bg-github-800 dark:text-github-300 dark:ring-github-500/20">Security First</span>
                             <span class="inline-flex items-center rounded-full bg-github-50 px-3 py-1 text-xs font-medium text-github-600 ring-1 ring-inset ring-github-500/10 dark:bg-github-800 dark:text-github-300 dark:ring-github-500/20">Production Ready</span>
                         </div>
+                        <p class="mt-5 text-sm text-github-600 dark:text-github-400">If this guide helps you, please <a href="https://github.com/azhar25git/php8-tutorial" target="_blank" rel="noopener" class="font-medium text-php-600 hover:text-php-700 dark:text-php-400 dark:hover:text-php-300 underline underline-offset-2">star the project on GitHub</a> — it helps others find it.</p>
                     </div>
 
                     <!-- Compact module header -->
